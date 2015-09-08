@@ -13,7 +13,8 @@ if(isset($_POST['submit']))
 
 
 $insert = "INSERT INTO users(username,category,password) VALUES('$username',3,'$password');";
-$insert .= "INSERT INTO users_profile(username,fullname,email,phoneNumber) VALUES('$username','$fullname','$email','$phoneNumber')";
+$insert .= "INSERT INTO users_profile(username,fullname,email,phoneNumber) VALUES('$username','$fullname','$email','$phoneNumber');";
+$insert .= "INSERT INTO player_credit(username) VALUES('$username')";
 
 if($db->multi_query($insert) === TRUE)  
  {

@@ -6,8 +6,13 @@ if(!isset($_SESSION['user']))
 {
         header("Location: index.php");
 }
+
 $res=$db->query("SELECT * FROM users WHERE user_id=".$_SESSION['user']);
 $userRow=mysqli_fetch_array($res);
+$username=$userRow['username'];
+$getCredit=$db->query("SELECT * FROM player_credit WHERE username='$username'");
+$creditBalance=mysqli_fetch_array($getCredit);
+
 ?>
 
 <!DOCTYPE html>
@@ -57,6 +62,7 @@ $userRow=mysqli_fetch_array($res);
 	                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
 	                        <ul class="dropdown-menu animated fadeInUp">
 				<li><?php echo $userRow['username']?></li>
+				<li>Credit : RM <?php echo $creditBalance['credit']?></li>
 	                          <li><a href="logout.php?logout">Logout</a></li>
 	                        </ul>
 	                      </li>
@@ -74,12 +80,14 @@ $userRow=mysqli_fetch_array($res);
 		  	<div class="sidebar content-box" style="display: block;">
                 <ul class="nav">
                     <!-- Main menu -->
-                    <li class="current"><a href="index.html"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
+                    <li class="current"><a href="index.php"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
                     <!--<li><a href="calendar.html"><i class="glyphicon glyphicon-calendar"></i> Calendar</a></li>
                     <li><a href="stats.html"><i class="glyphicon glyphicon-stats"></i> Statistics (Charts)</a></li>-->
+                    <li><a href="tables.html"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
                     <li><a href="tables.html"><i class="glyphicon glyphicon-list"></i> Tables</a></li>
                    <!-- <li><a href="buttons.html"><i class="glyphicon glyphicon-record"></i> Buttons</a></li>
                     <li><a href="editors.html"><i class="glyphicon glyphicon-pencil"></i> Editors</a></li>-->
+                    <li><a href="creditTransfer.html"><i class="glyphicon glyphicon-tasks"></i> Credit Transfer</a></li>
                     <li><a href="forms.html"><i class="glyphicon glyphicon-tasks"></i> Forms</a></li>
                     <li class="submenu">
                          <a href="#">
@@ -102,7 +110,7 @@ $userRow=mysqli_fetch_array($res);
 							<div class="panel-title">Welcome to Admin Test Portal Main Page</div>
 						</div>
 		  				<div class="panel-body">
-						<iframe width="420" height="315" src="https://www.youtube.com/embed/52X6wugWc2s?autoplay=1" frameborder="0" allowfullscreen></iframe>
+							helo
 		  				</div>
 		  			</div>
 		  		</div>
