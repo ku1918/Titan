@@ -1,13 +1,13 @@
 <?php
 session_start();
-include_once 'include/dbconnect.php';
+include_once 'include/dbconnect2.php';
 
 if(!isset($_SESSION['user']))
 {
         header("Location: index.php");
 }
-$res=mysql_query("SELECT * FROM users WHERE user_id=".$_SESSION['user']);
-$userRow=mysql_fetch_array($res);
+$res=$db->query("SELECT * FROM users WHERE user_id=".$_SESSION['user']);
+$userRow=mysqli_fetch_array($res);
 ?>
 
 <!DOCTYPE html>
@@ -154,5 +154,6 @@ $userRow=mysql_fetch_array($res);
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="js/custom.js"></script>
+
   </body>
 </html>
