@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `cashier_credit`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cashier_credit` (
   `username` varchar(255) NOT NULL,
-  `credit` float NOT NULL
+  `credit` float unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -34,6 +34,7 @@ CREATE TABLE `cashier_credit` (
 
 LOCK TABLES `cashier_credit` WRITE;
 /*!40000 ALTER TABLE `cashier_credit` DISABLE KEYS */;
+INSERT INTO `cashier_credit` VALUES ('ku123',200),('berry test',0);
 /*!40000 ALTER TABLE `cashier_credit` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -46,7 +47,7 @@ DROP TABLE IF EXISTS `master_credit`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `master_credit` (
   `username` varchar(255) NOT NULL,
-  `credit` float NOT NULL
+  `credit` float unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -56,6 +57,7 @@ CREATE TABLE `master_credit` (
 
 LOCK TABLES `master_credit` WRITE;
 /*!40000 ALTER TABLE `master_credit` DISABLE KEYS */;
+INSERT INTO `master_credit` VALUES ('ku1',102);
 /*!40000 ALTER TABLE `master_credit` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -68,7 +70,7 @@ DROP TABLE IF EXISTS `player_credit`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `player_credit` (
   `username` varchar(255) NOT NULL,
-  `credit` float NOT NULL DEFAULT '0'
+  `credit` float unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -78,8 +80,31 @@ CREATE TABLE `player_credit` (
 
 LOCK TABLES `player_credit` WRITE;
 /*!40000 ALTER TABLE `player_credit` DISABLE KEYS */;
-INSERT INTO `player_credit` VALUES ('123',1000.12),('12345',0);
+INSERT INTO `player_credit` VALUES ('ku',591);
 /*!40000 ALTER TABLE `player_credit` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction_log`
+--
+
+DROP TABLE IF EXISTS `transaction_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transaction_log` (
+  `date` date NOT NULL,
+  `transaction` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction_log`
+--
+
+LOCK TABLES `transaction_log` WRITE;
+/*!40000 ALTER TABLE `transaction_log` DISABLE KEYS */;
+INSERT INTO `transaction_log` VALUES ('2015-10-03','123,ku1,100,-,2,102'),('2015-09-25','123,ku1,100,-,102,123');
+/*!40000 ALTER TABLE `transaction_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -90,16 +115,16 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
-  `user_id` int(255) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(25) NOT NULL,
   `password` varchar(50) NOT NULL,
   `category` int(1) NOT NULL,
   `active_code` varchar(300) DEFAULT NULL,
   `login_status` int(1) DEFAULT NULL,
-  `last_login` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_login` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -108,7 +133,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'ku1918','d58949b3d4caf3bb1d8d33f5ae8d3529',3,NULL,0,'2015-09-08 13:42:45'),(2,'123','4297f44b13955235245b2497399d7a93',3,NULL,1,'2015-09-08 14:32:04'),(3,'1234','4297f44b13955235245b2497399d7a93',3,NULL,0,'2015-09-08 13:43:26'),(4,'12345','4297f44b13955235245b2497399d7a93',3,NULL,0,'2015-09-08 13:43:51');
+INSERT INTO `users` VALUES (1,'ku','4297f44b13955235245b2497399d7a93',3,NULL,1,'2015-09-28 15:44:20'),(2,'ku1','4297f44b13955235245b2497399d7a93',1,NULL,1,'2015-09-21 13:18:05'),(3,'ku123','4297f44b13955235245b2497399d7a93',2,NULL,1,'2015-09-21 13:18:52'),(4,'123','4297f44b13955235245b2497399d7a93',0,NULL,1,'2015-10-03 14:16:58'),(5,'berry test','4297f44b13955235245b2497399d7a93',2,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -120,14 +145,14 @@ DROP TABLE IF EXISTS `users_profile`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users_profile` (
-  `user_id` int(255) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(25) NOT NULL,
   `fullname` varchar(50) NOT NULL,
   `email` varchar(35) NOT NULL,
   `phoneNumber` varchar(15) NOT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -136,7 +161,7 @@ CREATE TABLE `users_profile` (
 
 LOCK TABLES `users_profile` WRITE;
 /*!40000 ALTER TABLE `users_profile` DISABLE KEYS */;
-INSERT INTO `users_profile` VALUES (1,'ku1918','ku wei xiong','kuweixiong@gmail.com','166365831'),(2,'123','123','123@123.com','0121231234'),(3,'12345','123123123','123@123.com','1231231231');
+INSERT INTO `users_profile` VALUES (1,'ku','123','123@123.com','1231231111'),(2,'ku1','123','123@123.com','(123) 123-1231'),(3,'ku123','123123123','123@123.com','(123) 123-1231'),(4,'123','123123','12321@comlete.com','(123) 123-1231'),(5,'berry test','tester','test@gmail.com','(016) 111-1231');
 /*!40000 ALTER TABLE `users_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -149,4 +174,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-09-09  7:01:58
+-- Dump completed on 2015-10-07  9:35:14
