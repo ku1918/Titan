@@ -120,7 +120,7 @@ if(response == 1){
 			<input type="email" class="form-control" placeholder="Email Address" id="email" name="email" />
 		</div>
 		<div>
-			<input type="tel" pattern='\d{10}' class="form-control" placeholder="Phone Number (0121234567)" required="" id="phoneNumber" name="phoneNumber" />
+			<input type="tel" class="form-control" pattern='\d{10}' placeholder="Phone Number" data-mask="(999) 999-9999" required="" id="phoneNumber" name="phoneNumber" />
 		</div>
 		<div>
 			<input type="password" title="Password must contain at least 6 character" pattern=".{6,}" class="form-control" placeholder="Password" required="" id="password" name="password" onchange="form.confirmPassword.pattern = this.value;" /> 

@@ -16,6 +16,7 @@ if(isset($_POST['login']))
  if($row['password']==md5($password))
  {
   $_SESSION['user'] = $row['user_id'];
+  $login_status=$db->query("UPDATE users SET login_status=1 where username='$username'");
   header("Location: index.php");
  }
  else
@@ -38,7 +39,7 @@ if(isset($_POST['login']))
  <link href="css/styles.css" rel="stylesheet">
     <script src="js/jquery-1.10.2.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script type-"test/javascript" src="js/jquery.validate.min.js"></script>
+    <script type-"test/javascript" src="js/jquery.validate.min.js"></script> 
 
 
 
@@ -46,8 +47,6 @@ if(isset($_POST['login']))
 .error{
 margin-top: 6px;
 margin-bottom: 0;
-color: #fff;
-background-color: #D65C4F;
 display: table;
 padding: 5px 8px;
 font-size: 11px;
@@ -119,11 +118,11 @@ line-height: 14px;
     <div class="modal-body">
       <form class="form-horizontal"  action="#" id="form_reset_pwd">
       <fieldset>
-        <p>Enter your Email Address here to receive a linkdd to change password.</p>
+        <p>Enter your Username to reset your password.</p>
         <div class="form-group">
-          <label class="col-sm-3 control-label">Email :</label>
+          <label class="col-sm-3 control-label">Username :</label>
           <div class="col-sm-9">
-            <input type="text" class="form-control required email" name="email" placeholder="Email"/>
+            <input type="text" class="form-control" name="email" placeholder="Username"/>
           </div>
         </div>
         <div id="error_result"></div>
@@ -157,12 +156,10 @@ line-height: 14px;
             if(data==1)
             {
               $('#error_result').html('Check your email');
-              $('#error_result').addClass("green");
             }
             else
             {
-              $('#error_result').html('Invalid email id. Please check your email id.');
-              $('#error_result').addClass("red");
+              $('#error_result').html('Invalid username. Please check your username spelling.');
             }
           }
         });

@@ -2,16 +2,22 @@
 session_start();
 include_once 'include/dbconnect2.php';
 
-if(!isset($_SESSION['user']))
-{
-        header("Location: index.php");
+if(!isset($_SESSION['user'])){
+	header ("Location: login.php");
 }
 
-$res=$db->query("SELECT * FROM users WHERE user_id=".$_SESSION['user']);
+
+//UserInformation
+$res=$db->query("select * from users where username='".$_SESSION['user']."'");
 $userRow=mysqli_fetch_array($res);
 $username=$userRow['username'];
-$getCredit=$db->query("SELECT * FROM player_credit WHERE username='$username'");
+$userCategory=$userRow['category'];
+
+
+//get User Credit
+$getCredit=$db->query("select username,credit from ((select * from player_credit) union (select * from cashier_credit) union (select * from master_credit)) as a where a.username='$username'");
 $creditBalance=mysqli_fetch_array($getCredit);
+$sourceCredit=$creditBalance['credit'];
 
 ?>
 
@@ -45,12 +51,6 @@ $creditBalance=mysqli_fetch_array($getCredit);
 	           <div class="col-md-5">
 	              <div class="row">
 	                <div class="col-lg-12">
-	                <!--  <div class="input-group form">
-		       	<input type="text" class="form-control" placeholder="Search...">
-		       	<span class="input-group-btn">
-	                         <button class="btn btn-primary" type="button">Search</button>
-	                       </span>
-	                  </div>-->
 	                </div>
 	              </div>
 	           </div>
@@ -61,8 +61,12 @@ $creditBalance=mysqli_fetch_array($getCredit);
 	                      <li class="dropdown">
 	                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
 	                        <ul class="dropdown-menu animated fadeInUp">
-				<li><?php echo $userRow['username']?></li>
-				<li>Credit : RM <?php echo $creditBalance['credit']?></li>
+				<li><?php echo $username ?></li>
+				<?php if ($userCategory == 0){ ?> 
+				<li>Credit : Infinite </li>
+				<?php } else{ ?>
+				<li>Credit : RM <?php echo $sourceCredit ?></li>
+				<?php } ?>
 	                          <li><a href="logout.php?logout">Logout</a></li>
 	                        </ul>
 	                      </li>
@@ -81,24 +85,87 @@ $creditBalance=mysqli_fetch_array($getCredit);
                 <ul class="nav">
                     <!-- Main menu -->
                     <li class="current"><a href="index.php"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
-                    <!--<li><a href="calendar.html"><i class="glyphicon glyphicon-calendar"></i> Calendar</a></li>
-                    <li><a href="stats.html"><i class="glyphicon glyphicon-stats"></i> Statistics (Charts)</a></li>-->
-                    <li><a href="tables.html"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
-                    <li><a href="tables.html"><i class="glyphicon glyphicon-list"></i> Tables</a></li>
-                   <!-- <li><a href="buttons.html"><i class="glyphicon glyphicon-record"></i> Buttons</a></li>
-                    <li><a href="editors.html"><i class="glyphicon glyphicon-pencil"></i> Editors</a></li>-->
-                    <li><a href="creditTransfer.html"><i class="glyphicon glyphicon-tasks"></i> Credit Transfer</a></li>
-                    <li><a href="forms.html"><i class="glyphicon glyphicon-tasks"></i> Forms</a></li>
+              <?php 
+		      if($userCategory == 0){
+		?>
+		    <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
                     <li class="submenu">
                          <a href="#">
-                            <i class="glyphicon glyphicon-list"></i> Pages
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
                             <span class="caret pull-right"></span>
                          </a>
                          <!-- Sub menu -->
                          <ul>
-                            <li><a href="signup.php">Signup</a></li>
+                            <li><a href="master_credit_transfer.php">Master</a></li>
+                            <li><a href="cashier_credit_transfer.php">Cashier</a></li>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
                         </ul>
                     </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+		<?php
+			}
+			elseif($userCategory == 1){
+			?>
+			 <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="cashier_credit_transfer.php">Cashier</a></li>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
+                        </ul>
+                    </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+		<?php
+		}
+		elseif($userCategory == 2){
+		?>
+		 <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
+                        </ul>
+                    </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+		<?php
+		}
+		?>
+			
                 </ul>
              </div>
 		  </div>

@@ -2,7 +2,7 @@
 session_start();
 include_once 'include/dbconnect2.php';
 
-if(isset($_SESSION['user'])!="")
+if(isset($_SESSION['user']))
 {
  header("Location: index.php");
 }
@@ -15,8 +15,8 @@ if(isset($_POST['login']))
  $row=mysqli_fetch_array($res);
  if($row['password']==md5($password))
  {
-  $_SESSION['user'] = $row['user_id'];
-  $login_status=$db->query("UPDATE users SET login_status=1 where username='$username'");
+  $_SESSION['user'] = $row['username'];
+  $login_status=$db->query("UPDATE users SET login_status=1,last_login=now() where username='$username'");
   header("Location: index.php");
  }
  else
