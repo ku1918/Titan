@@ -13,12 +13,13 @@ $userCategory=$userRow['category'];
 
 $getCredit=$db->query("select username,credit from ((select * from player_credit) union (select * from cashier_credit) union (select * from master_credit)) as a where a.username='$username'");
 $creditBalance=mysqli_fetch_array($getCredit);
+$sourceCredit=$creditBalance['credit'];
 
 
 
 if(isset($_POST['submit']))
 {
- $username = mysqli_real_escape_string($db,$_POST['username']);
+ $userCreate = mysqli_real_escape_string($db,$_POST['username']);
  $fullname = mysqli_real_escape_string($db,$_POST['fullname']);
  $email = mysqli_real_escape_string($db,$_POST['email']);
  $phoneNumber = mysqli_real_escape_string($db,$_POST['phoneNumber']);
@@ -26,17 +27,17 @@ if(isset($_POST['submit']))
  $password = md5(mysqli_real_escape_string($db,$_POST['password']));
 
 
-$insert = "INSERT INTO users(username,category,password) VALUES('$username','$category','$password');";
-$insert .= "INSERT INTO users_profile(username,fullname,email,phoneNumber) VALUES('$username','$fullname','$email','$phoneNumber');";
+$insert = "INSERT INTO users(username,category,password,user_owner) VALUES('$userCreate','$category','$password','$username');";
+$insert .= "INSERT INTO users_profile(username,fullname,email,phoneNumber) VALUES('$userCreate','$fullname','$email','$phoneNumber');";
 
 if($category == 1){
-$insert .= "INSERT INTO master_credit(username) VALUES('$username')";
+$insert .= "INSERT INTO master_credit(username) VALUES('$userCreate')";
 }
 elseif ($category == 2){
-$insert .= "INSERT INTO cashier_credit(username) VALUES('$username')";
+$insert .= "INSERT INTO cashier_credit(username) VALUES('$userCreate')";
 }
 elseif ($category == 3){
-$insert .= "INSERT INTO player_credit(username) VALUES('$username')";
+$insert .= "INSERT INTO player_credit(username) VALUES('$userCreate')";
 }
 
 
@@ -289,7 +290,7 @@ if(response == 1){
 								  <div class="form-group">
 								    <label class="col-sm-2 control-label">Telephone number</label>
 								    <div class="col-sm-10">
-									 <input type="tel" class="form-control" placeholder="Phone Number" data-mask="(999) 999-9999"  required="" id="phoneNumber" name="phoneNumber" />
+									 <input type="tel" class="form-control" placeholder="Phone Number" data-mask="9999999999"  required="" id="phoneNumber" name="phoneNumber" />
 								    </div>
 								  </div>
 								  <div class="form-group">

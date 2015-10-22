@@ -1,22 +1,28 @@
 <?php
 session_start();
-include_once 'include/dbconnect.php';
+include_once 'include/dbconnect2.php';
 
 if(isset($_POST['submit']))
 {
- $username = mysql_real_escape_string($_POST['username']);
- $fullname = mysql_real_escape_string($_POST['fullname']);
- $email = mysql_real_escape_string($_POST['email']);
- $phoneNumber = mysql_real_escape_string($_POST['phoneNumber']);
- $category = mysql_real_escape_string($_POST['category']);
- $password = md5(mysql_real_escape_string($_POST['password']));
+ $username = mysqli_real_escape_string($db,$_POST['username']);
+ $fullname = mysqli_real_escape_string($db,$_POST['fullname']);
+ $email = mysqli_real_escape_string($db,$_POST['email']);
+ $phoneNumber = mysqli_real_escape_string($db,$_POST['phoneNumber']);
+ #$category = mysqli_real_escape_string($db,$_POST['category']);
+ $password = md5(mysqli_real_escape_string($db,$_POST['password']));
 
- if(mysql_query("INSERT INTO users(username,fullname,email,phoneNumber,category,password) VALUES('$username','$fullname','$email','$phoneNumber','$category','$password')"))
+
+$insert = "INSERT INTO users(username,category,password) VALUES('$username',3,'$password');";
+$insert .= "INSERT INTO users_profile(username,fullname,email,phoneNumber) VALUES('$username','$fullname','$email','$phoneNumber');";
+$insert .= "INSERT INTO player_credit(username) VALUES('$username')";
+
+if($db->multi_query($insert) === TRUE)  
  {
+
   ?>
         <?php
-	header('Location: registerSuccess.html');
- }
+        header('Location: registerSuccess.html');
+}
  else
  {
   ?>
@@ -46,7 +52,6 @@ function username_check(){
 var username = $('#username').val();
 if(username == ""){
 $('#username').css('border', '3px #CCC solid');
-$('#tick').hide();
 }else{
 
 jQuery.ajax({
@@ -57,13 +62,9 @@ jQuery.ajax({
    success: function(response){
 if(response == 1){
         $('#username').css('border', '3px #C33 solid');
-        $('#tick').hide();
-        $('#cross').fadeIn();
 	$('#inform').text("The username has been taken.Please use another.");
         }else{
         $('#username').css('border', '3px #090 solid');
-        $('#cross').hide();
-        $('#tick').fadeIn();
 	$('#inform').text("The username is avalable");
              }
 
@@ -119,14 +120,14 @@ if(response == 1){
 			<input type="email" class="form-control" placeholder="Email Address" id="email" name="email" />
 		</div>
 		<div>
-			<input type="tel" pattern='\d{10}' class="form-control" placeholder="Phone Number (0121234567)" required="" id="phoneNumber" name="phoneNumber" />
+			<input type="tel" class="form-control" placeholder="Phone Number" data-mask="9999999999" required="" id="phoneNumber" name="phoneNumber" />
 		</div>
 		<div>
 			<input type="password" title="Password must contain at least 6 character" pattern=".{6,}" class="form-control" placeholder="Password" required="" id="password" name="password" onchange="form.confirmPassword.pattern = this.value;" /> 
 		</div>
 			<input type="password" title="Please enter the same Password as above" class="form-control" placeholder="Confirm Password" pattern=".{6,}" required="" id="confirmPassword" />
 		</div> 
-		<div>
+<!--		<div>
 			<select name="category" required="" >
 				<option value="Category" disabled selected>Select Category</option>
 				<option value="0">Superadmin</option>
@@ -134,7 +135,7 @@ if(response == 1){
 				<option value="2">Cashier</option>
 				<option value="3">Player</option>
 			</select>
-		</div>
+		</div> -->
 		<div id="inform"></div>
 			<!--        <input class="form-control" type="text" placeholder="E-mail address">
 				<input class="form-control" type="password" placeholder="Password">

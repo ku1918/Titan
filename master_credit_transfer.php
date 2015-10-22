@@ -136,8 +136,13 @@ else{
     <!-- styles -->
     <link href="css/styles.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css" />
-    <script type="text/javascript" language="javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" language="javascript" src="js/jquery.js"></script> 
     <script type="text/javascript" language="javascript" src="js/jquery.dataTables.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+
+
       <script type="text/javascript" language="javascript" >
                         $(document).ready(function() {
                                 var dataTable = $('#master-credit').DataTable( {
@@ -148,7 +153,7 @@ else{
                                                 type: "post",  // method  , by default get
                                                 error: function(){  // error handling
                                                         $(".master-credit-error").html("");
-                                                        $("#master-credit").append('<tbody class="player-credit-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                                                        $("#master-credit").append('<tbody class="master-credit-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                                                         $("#master-credit_processing").css("display","none");
 
                                                 }
@@ -321,7 +326,19 @@ else{
               <div class="form-group">
                 <label for="Username" class="col-sm-2 control-label">Username</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" placeholder="Username" required="" id="target_username" name="target_username" />
+ <?php
+                        $dropDownSQL=$db->query("SELECT username from master_credit");
+                ?>
+                <select name="target_username" class="form-control" >
+                <option value="0">Choose</option>
+                <?php
+                        while($dropdown = mysqli_fetch_array($dropDownSQL)){
+                                echo '<option value="'.$dropdown['username'].'">'. $dropdown['username'].'</option>';
+                        }
+                ?>
+                </select>
+
+            <!--      <input type="text" class="form-control" placeholder="Username" required="" id="target_username" name="target_username" /> -->
                 </div>
               </div>
               <div class="form-group">
@@ -331,15 +348,15 @@ else{
                     <div class="col-sm-12">
                       <div class="input-group">
                       <span class="input-group-addon">RM</span> 
-                      <input class="form-control" name="amount" id="amount" required="" placeholder="Amount" type="number" /></div>
+                      <input class="form-control" name="amount" id="amount" required="" placeholder="Amount" type="number" step="any" /></div>
                     </div>
                   </div>
                 </div>
               </div>
 		<div class="form-group">
                                                                     <div class="col-sm-offset-2 col-sm-10">
-                                                                        <input class="btn btn-primary" type="submit" value="Top Up" id="topup" name="topup" >
-                                                                        <input class="btn btn-primary" type="submit" value="Withdraw" name="withdraw" id="withdraw">
+                                                                        <input class="btn btn-primary" type="submit" value="Top Up" id="topup" name="topup"  onClick="return confirm('Confirm Topup?');" >
+                                                                        <input class="btn btn-primary" type="submit" value="Withdraw" name="withdraw" id="withdraw" onClick="return confirm('Confirm Withdraw?');">
 
                                                                     </div>
                                                                   </div>

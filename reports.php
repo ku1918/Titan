@@ -17,7 +17,7 @@ $sourceCredit=$creditBalance['credit'];
 
 $logging="select * from transaction_log";
 $result =$db->query($logging);
-#$transactiondata=mysqli_fetch_array($result);
+$transactiondata=mysqli_fetch_array($result);
 
 
 
@@ -55,8 +55,8 @@ $(function() {
 
     function cb(start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-  	//$('#to').val(start.format('YYYY-MM-DD'));
-        //$('#from').val(end.format('YYYY-MM-DD'));
+  	$('#to').val(start.format('YYYY-MM-DD'));
+        $('#from').val(end.format('YYYY-MM-DD'));
     }
     cb(moment().subtract(29, 'days'), moment());
 
@@ -254,23 +254,34 @@ Date :
 <thead>
                 <tr>
                   <th>Date</th>
-                  <th>From:</th>
-                  <th>To:</th>
-                  <th>Topup Credit</th>
-                  <th>Withdraw Credit</th>
-                  <th>Last Credit</th>
-                  <th>Current Credit</th>
+                  <th>Username</th>
+                  <th>Deposits</th>
+                  <th>Withdrawal</th>
+                  <th>Bets</th>
+                  <th>Wins</th>
+                  <th>Net Loss</th>
+                  <th>Net Purchase</th>
+                  <th>Net Gaming</th>
+                  <th>Progressive Share</th>
+
                </tr>
 </thead>
-		  <?php   while($row=mysqli_fetch_array($result)){ $transactiondata=explode(",",$row['transaction']); echo "<tr>"; echo "<td>" . $row['date'] . "</td>";  
-		  echo "<td>" . $transactiondata[0] . "</td>";  
-		  echo "<td>" . $transactiondata[1] . "</td>";  
-		  echo "<td>" . $transactiondata[2] . "</td>";  
-		  echo "<td>" . $transactiondata[3] . "</td>";  
-		  echo "<td>" . $transactiondata[4] . "</td>";  
-		  echo "<td>" . $transactiondata[5] . "</td>"; echo "</tr>"; 
-
+		  <?php   while($row=mysqli_fetch_array($result)){  
+			
+		  echo "<tr>"; 
+		  echo "<td>" . $row['date'] . "</td>";  
+		  echo "<td>" . $row['Username'] . "</td>";  
+		  echo "<td>" . $row['Deposits'] . "</td>";  
+		  echo "<td>" . $row['Withdrawal'] . "</td>";  
+		  echo "<td>" . $row['Bets'] . "</td>";  
+		  echo "<td>" . $row['Wins'] . "</td>";  
+		  echo "<td>" . $row['NetLoss'] . "</td>";  
+		  echo "<td>" . $row['NetPurchase'] . "</td>";  
+		  echo "<td>" . $row['NetGaming'] . "</td>";  
+		  echo "<td>" . $row['ProgressiveShare'] . "</td>";  
+		  echo "</tr>"; 
 }?>
+		
 		  
             </table>
           </div>
@@ -301,35 +312,14 @@ Date :
   <script src="js/custom.js"></script> 
   <script src="js/tables.js"></script></body>
 </html>
-	<script type="text/javascript" language="javascript">
-
-
-/* Custom filtering function which will search data in column four between two values */
-$.fn.dataTable.ext.search.push(
-	function( settings, data, dataIndex ) {
-		var min = parseInt( $('#to').val(), 10 );
-		var max = parseInt( $('#from').val(), 10 );
-		var age = parseFloat( data[7] ) || 0; // use data for the age column
-
-		if ( ( isNaN( min ) && isNaN( max ) ) ||
-			 ( isNaN( min ) && age <= max ) ||
-			 ( min <= age   && isNaN( max ) ) ||
-			 ( min <= age   && age <= max ) )
-		{
-			return true;
-		}
-		return false;
-	}
-);
+<script type="text/javascript">
 
 $(document).ready(function() {
-	var table = $('#example').DataTable();
-	
-	// Event listener to the two range filtering inputs to redraw on input
-	$('#to, #from').keyup( function() {
-		table.draw();
-	} );
-} );
-
-
-	</script>
+    $('#example').dataTable( {
+        "footerCallback": function ( row, data, start, end, display ) {
+            var api = this.api();         
+            $(api.column(3).footer()).html('Footer Value'+'test');
+            };
+}
+}
+</script>

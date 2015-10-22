@@ -167,6 +167,89 @@ if(response == 1){
  <ul class="nav">
                     <!-- Main menu -->
                     <li><a href="index.php"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
+
+	<?php
+                      if($userCategory == 0){
+                ?>
+                    <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="master_credit_transfer.php">Master</a></li>
+                            <li><a href="cashier_credit_transfer.php">Cashier</a></li>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
+                        </ul>
+                    </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+                <?php
+                        }
+                        elseif($userCategory == 1){
+                        ?>
+                         <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="cashier_credit_transfer.php">Cashier</a></li>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
+                        </ul>
+                    </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+                <?php
+                }
+                elseif($userCategory == 2){
+ ?>
+                 <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
+                        </ul>
+                    </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+                <?php
+                }
+                ?>
+
+                </ul>
              </div>
 		  </div>
 		  <div class="col-md-10">

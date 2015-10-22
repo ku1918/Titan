@@ -21,7 +21,6 @@ $query=mysqli_query($db, $sql) or die("Fail Query");
 $totalData = mysqli_num_rows($query);
 $totalFiltered = $totalData;  // when there is no search parameter then total number rows = total number filtered rows.
 
-
 $sql = "SELECT username,credit";
 $sql.=" FROM player_credit WHERE 1=1";
 if( !empty($requestData['search']['value']) ) {   // if there is a search parameter, $requestData['search']['value'] contains search parameter

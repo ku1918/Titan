@@ -1,8 +1,9 @@
 <?php
 include_once 'include/dbconnect2.php';
 session_start();
+$res=$db->query("select * from users where username='".$_SESSION['user']."'");
 
-$res=$db->query("SELECT * FROM users WHERE user_id=".$_SESSION['user']);
+#$res=$db->query("SELECT * FROM users WHERE username=".$_SESSION['user']);
 $userRow=mysqli_fetch_array($res);
 $username=$userRow['username'];
 

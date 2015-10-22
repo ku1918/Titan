@@ -13,12 +13,12 @@ $userCategory=$userRow['category'];
 
 $getCredit=$db->query("select username,credit from ((select * from player_credit) union (select * from cashier_credit) union (select * from master_credit)) as a where a.username='$username'");
 $creditBalance=mysqli_fetch_array($getCredit);
+$sourceCredit=$creditBalance['credit'];
 
   $targetUser=$_POST['target_username'];
   $amount=$_POST['amount'];
 
-  $checkUserSQL="SELECT username FROM cashier_credit WHERE username='$targetUser'";
-  $checkUser=$db->query($checkUserSQL);
+  $checkUser=$db->query("SELECT username FROM cashier_credit WHERE username='$targetUser'");
   $userRowCount=mysqli_num_rows($checkUser);
 
   $getTargetCreditSQL = $db->query("SELECT credit FROM cashier_credit WHERE username='$targetUser'");
@@ -26,10 +26,7 @@ $creditBalance=mysqli_fetch_array($getCredit);
   $getTargetCreditArray2=$getTargetCreditArray['credit'];
   $getTargetCreditFloat=floatval($getTargetCreditArray2);
 
-  $getSourceCreditSQL = $db->query("SELECT credit FROM cashier_credit WHERE username='$username'");
-  $getSourceCreditArray=mysqli_fetch_array($getSourceCreditSQL);
-  $getSourceCreditArray2=$getSourceCreditArray['credit'];
-  $getSourceCreditFloat=floatval($getSourceCreditArray2);
+  $getSourceCreditFloat=floatval($sourceCredit);
 
 if(isset($_POST['topup'])){
 $totalAmount = $getTargetCreditFloat+$amount;
@@ -37,7 +34,7 @@ $transferAmount = $getSourceCreditFloat-$amount;
 
 if($userRowCount > 0){
 
-if($amount > $getSourceCreditFloat){
+if($amount > $getSourceCreditFloat && $userCategory != 0 ){
 ?>
         <script>alert('Insufficient Amount');</script>
 	<?php
@@ -47,7 +44,14 @@ $updateTarget = "UPDATE cashier_credit SET credit='$totalAmount' where username=
 if(mysqli_query($db,$updateTarget) === TRUE)
 {
 if(mysqli_affected_rows($db)>0){
+
+if($userCategory == 1){
+$updateSource = "UPDATE master_credit SET credit='$transferAmount' where username='$username'";
+}
+elseif($userCategory == 2){
 $updateSource = "UPDATE cashier_credit SET credit='$transferAmount' where username='$username'";
+}
+
 $transfer=$db->query($updateSource);
   ?>
         <script>alert('Topup success');</script>
@@ -86,7 +90,12 @@ $updateTarget = "UPDATE cashier_credit SET credit='$totalAmount' where username=
 if(mysqli_query($db,$updateTarget) === TRUE)
 {
 if(mysqli_affected_rows($db) > 0){
+if($userCategory == 1){
+$updateSource = "UPDATE master_credit SET credit='$transferAmount' where username='$username'";
+}
+elseif($userCategory == 2){
 $updateSource = "UPDATE cashier_credit SET credit='$transferAmount' where username='$username'";
+}
 $transfer=$db->query($updateSource);
   ?>
         <script>alert('Withdraw success');</script>
@@ -136,7 +145,7 @@ else{
                                                 type: "post",  // method  , by default get
                                                 error: function(){  // error handling
                                                         $(".cashier-credit-error").html("");
-                                                        $("#cashier-credit").append('<tbody class="cashier-credit-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                                                        $("#cashier-credit").append('<tbody class="player-credit-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                                                         $("#cashier-credit_processing").css("display","none");
 
                                                 }
@@ -170,10 +179,14 @@ else{
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account<b class="caret"></b></a>
                   <ul class="dropdown-menu animated fadeInUp">
                     <li>
-                        <?php echo $userRow['username']?>
+                        <?php echo $username ?>
                     </li>
-                    <li>Credit : RM <?php echo $creditBalance['credit']?></li>
-                    <li>
+	  <?php if ($userCategory == 0){ ?>
+                                <li>Credit : Infinite </li>
+                                <?php } else{ ?>
+                                <li>Credit : RM <?php echo $sourceCredit ?></li>
+                                <?php } ?>
+		<li>
                       <a href="logout.php?logout">Logout</a>
                     </li>
                   </ul>
@@ -192,8 +205,7 @@ else{
 	 <ul class="nav">
                     <!-- Main menu -->
                     <li><a href="index.php"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
-
-<?php
+			 <?php
                       if($userCategory == 0){
                 ?>
                     <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
@@ -273,6 +285,7 @@ else{
                 <?php
                 }
                 ?>
+
 
 	</ul>
         </div>

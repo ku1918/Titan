@@ -34,7 +34,7 @@ $transferAmount = $getSourceCreditFloat-$amount;
 
 if($userRowCount > 0){
 
-if($amount > $getSourceCreditFloat && $userCategory != 0 ){
+if($amount > $getSourceCreditFloat && $userCategory != 0){
 ?>
         <script>alert('Insufficient Amount');</script>
 	<?php
@@ -53,6 +53,9 @@ $updateSource = "UPDATE cashier_credit SET credit='$transferAmount' where userna
 }
 
 $transfer=$db->query($updateSource);
+$message = mysqli_real_escape_string($db,"$username,$targetUser,$amount,-,$getTargetCreditFloat,$totalAmount");
+$logsql = "INSERT into transaction_log (date,transaction) values ( now(),'$message')";
+$logging=$db->query($logsql) or trigger_error($db->error."[$logsql]");
   ?>
         <script>alert('Topup success');</script>
         <?php
@@ -133,8 +136,13 @@ else{
     <!-- styles -->
     <link href="css/styles.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css" />
-    <script type="text/javascript" language="javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" language="javascript" src="js/jquery.js"></script> 
     <script type="text/javascript" language="javascript" src="js/jquery.dataTables.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+
+
       <script type="text/javascript" language="javascript" >
                         $(document).ready(function() {
                                 var dataTable = $('#cashier-credit').DataTable( {
@@ -145,7 +153,7 @@ else{
                                                 type: "post",  // method  , by default get
                                                 error: function(){  // error handling
                                                         $(".cashier-credit-error").html("");
-                                                        $("#cashier-credit").append('<tbody class="player-credit-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                                                        $("#cashier-credit").append('<tbody class="cashier-credit-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                                                         $("#cashier-credit_processing").css("display","none");
 
                                                 }
@@ -181,12 +189,13 @@ else{
                     <li>
                         <?php echo $username ?>
                     </li>
-	  <?php if ($userCategory == 0){ ?>
+	                <?php if ($userCategory == 0){ ?>
                                 <li>Credit : Infinite </li>
                                 <?php } else{ ?>
                                 <li>Credit : RM <?php echo $sourceCredit ?></li>
                                 <?php } ?>
-		<li>
+
+                    <li>
                       <a href="logout.php?logout">Logout</a>
                     </li>
                   </ul>
@@ -317,7 +326,19 @@ else{
               <div class="form-group">
                 <label for="Username" class="col-sm-2 control-label">Username</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" placeholder="Username" required="" id="target_username" name="target_username" />
+ <?php
+                        $dropDownSQL=$db->query("SELECT username from cashier_credit");
+                ?>
+                <select name="target_username" class="form-control" >
+                <option value="0">Choose</option>
+                <?php
+                        while($dropdown = mysqli_fetch_array($dropDownSQL)){
+                                echo '<option value="'.$dropdown['username'].'">'. $dropdown['username'].'</option>';
+                        }
+                ?>
+                </select>
+
+            <!--      <input type="text" class="form-control" placeholder="Username" required="" id="target_username" name="target_username" /> -->
                 </div>
               </div>
               <div class="form-group">
@@ -327,15 +348,15 @@ else{
                     <div class="col-sm-12">
                       <div class="input-group">
                       <span class="input-group-addon">RM</span> 
-                      <input class="form-control" name="amount" id="amount" required="" placeholder="Amount" type="number" /></div>
+                      <input class="form-control" name="amount" id="amount" required="" placeholder="Amount" type="number" step="any" /></div>
                     </div>
                   </div>
                 </div>
               </div>
 		<div class="form-group">
                                                                     <div class="col-sm-offset-2 col-sm-10">
-                                                                        <input class="btn btn-primary" type="submit" value="Top Up" id="topup" name="topup" >
-                                                                        <input class="btn btn-primary" type="submit" value="Withdraw" name="withdraw" id="withdraw">
+                                                                        <input class="btn btn-primary" type="submit" value="Top Up" id="topup" name="topup"  onClick="return confirm('Confirm Topup?');" >
+                                                                        <input class="btn btn-primary" type="submit" value="Withdraw" name="withdraw" id="withdraw" onClick="return confirm('Confirm Withdraw?');">
 
                                                                     </div>
                                                                   </div>

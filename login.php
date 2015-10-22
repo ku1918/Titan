@@ -54,7 +54,7 @@ font-weight: 600;
 line-height: 14px;
   }
 
-</style>
+</style> 
 </head>
 <body>
  <body class="login-bg">
@@ -94,9 +94,7 @@ line-height: 14px;
                         </form>
 
                                 <div class="already">
-                                    <p>Don't have an account yet?</p>
-                                    <a href="signup.php">Sign Up</a>
-                                    <p class="pull-right"><a href="#" data-toggle="modal" data-target=".resetpassword" data-dismiss="modal">Forgot Password? </a>
+                                    <p class="pull-center"><a href="#" data-toggle="modal" data-target=".resetpassword" data-dismiss="modal">Forgot Password? </a>
                                 </div>
 
                             </div>
@@ -142,7 +140,7 @@ line-height: 14px;
 
 </body>
 </html>
-<script>
+<script
   $(document).ready(function(){
     $(document).on('click','.forgot_password',function(){
       var url = "reset/reset_password.php";
@@ -168,4 +166,3 @@ line-height: 14px;
     });
 });
 </script>
-                                    
