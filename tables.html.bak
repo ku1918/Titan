@@ -24,28 +24,23 @@
                                                 /* Calculate the total market share for all browsers in this table (ie inc. outside
                                                  * the pagination
                                                  */
-var api = this.api(), data;	 
-				// Remove the formatting to get integer data for summation
-				var intVal = function ( i ) {
-					return typeof i === 'string' ? i.replace(/[\$,-]/g, '')*1 : typeof i === 'number' ?	i : 0;
-				};
-	 
-				// total_salary over all pages
-				total_salary = api.column( 3 ).data().reduce( function (a, b) {
-					return intVal(a) + intVal(b);
-				},0 );
-				
-				// total_page_salary over this page
-				total_page_salary = api.column( 3, { page: 'current'} ).data().reduce( function (a, b) {
-					return intVal(a) + intVal(b);
-				}, 0 );
-				
-				total_page_salary = parseFloat(total_page_salary).toFixed(2);
-				total_salary = parseFloat(total_salary);
+                                                var iTotalMarket = 0;
+                                                for ( var i=0 ; i<aaData.length ; i++ )
+                                                {
+                                                        iTotalMarket += aaData[i][3]*1;
+                                                }
+
+                                                /* Calculate the market share for browsers on this page */
+                                                var iPageMarket = 0;
+                                                for ( var i=iDataStart ; i<iDataEnd ; i++ )
+                                                {
+                                                        iPageMarket += aaData[i][3]*1;
+                                                }
 
                                                 /* Modify the footer row to match what we want */
                                                 var nCells = nRow.getElementsByTagName('th');
-                                                nCells[1].innerHTML = total_page_salary;
+                                                nCells[1].innerHTML = parseInt(iPageMarket * 100)/100 +
+                                                        '% ('+ parseInt(iTotalMarket * 100)/100 +'% total)';
                                         }
                                 } );
                         } );

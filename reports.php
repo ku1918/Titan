@@ -15,6 +15,8 @@ $getCredit=$db->query("select username,credit from ((select * from player_credit
 $creditBalance=mysqli_fetch_array($getCredit);
 $sourceCredit=$creditBalance['credit'];
 
+#$logging="select * from transaction_log where date between '$datefrom' and '$dateto'";
+
 $logging="select * from transaction_log";
 $result =$db->query($logging);
 $transactiondata=mysqli_fetch_array($result);
@@ -42,13 +44,21 @@ $transactiondata=mysqli_fetch_array($result);
     <script type="text/javascript" language="javascript" src="js/jquery.dataTables.js"></script> 
 
 <!-- Include Required Prerequisites -->
-<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
-<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+<!--<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>  -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script> 
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" /> 
  
 <!-- Include Date Range Picker -->
-<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
-<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script> 
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />   
+<!--<script type="text/javascript">
+function functionn()
+{
+ var id = 'test';
+ document.location.href = "http://appboss.duckdns.org/profile/userid?="+id;
+}
+</script> -->
+
 
 <script type="text/javascript">
 $(function() {
@@ -76,7 +86,93 @@ $(function() {
     }, cb);
 
 });
-</script>
+</script> 
+
+<script type="text/javascript" charset="utf-8">
+                        $(document).ready(function() {
+ $('#example').DataTable( {
+
+"columnDefs": [ {
+    "targets": 1,
+    "data": "google.com",
+    "render": function ( data, type, full, meta ) {
+      return data + " (" + '<a href=/profile.php?id='+data+'>Profile</a>' + ")";
+
+    }
+  } ],
+
+                                        "fnFooterCallback": function ( nRow, aaData, iDataStart, iDataEnd ) {
+                                                /* Calculate the total market share for all browsers in this table (ie inc. outside
+                                                 * the pagination
+                                                 */
+var api = this.api(), data;
+                                // Remove the formatting to get integer data for summation
+                                var intVal = function ( i ) {
+                                        return typeof i === 'string' ? i.replace(/[\$,-]/g, '')*1 : typeof i === 'number' ?     i : 0;
+                                };
+
+                                // total_salary over all pages
+                                total_salary = api.column( 2 ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                },0 );
+
+                                // total_page_salary over this page
+                                total_page_deposits = api.column( 2, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
+
+                                total_page_withdrawal = api.column( 3, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
+                                total_page_bets = api.column( 4, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
+                                total_page_wins = api.column( 5, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
+                                total_page_netLoss = api.column( 6, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
+                                total_page_netPurchase = api.column( 7, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
+                                total_page_netGaming = api.column( 8, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
+                                total_page_progressiveShare = api.column( 9, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
+				
+
+                                total_page_deposits = parseFloat(total_page_deposits).toFixed(2);
+                                total_page_withdrawal = parseFloat(total_page_withdrawal).toFixed(2);
+                                total_page_bets = parseFloat(total_page_bets).toFixed(2);
+                                total_page_wins = parseFloat(total_page_wins).toFixed(2);
+                                total_page_netLoss = parseFloat(total_page_netLoss).toFixed(2);
+                                total_page_netPurchase = parseFloat(total_page_netPurchase).toFixed(2);
+                                total_page_netGaming = parseFloat(total_page_netGaming).toFixed(2);
+                                total_page_progressiveShare = parseFloat(total_page_progressiveShare).toFixed(2);
+
+                                                /* Modify the footer row to match what we want */
+                                                var nCells = nRow.getElementsByTagName('th');
+                                                nCells[1].innerHTML = total_page_deposits;
+                                                nCells[2].innerHTML = total_page_withdrawal;
+                                                nCells[3].innerHTML = total_page_bets;
+                                                nCells[4].innerHTML = total_page_wins;
+                                                nCells[5].innerHTML = total_page_netLoss;
+                                                nCells[6].innerHTML = total_page_netPurchase;
+                                                nCells[7].innerHTML = total_page_netGaming;
+                                                nCells[8].innerHTML = total_page_progressiveShare;
+                                        }
+
+
+
+
+
+                                } );
+                        } );
+
+                </script>
 
 
 
@@ -233,8 +329,12 @@ Date :
     <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
     <span></span> <b class="caret"></b>
 </div>
-<input  name="to" id="to" type='text'>
-<input name="from" id="from" type='text'>
+<form method='post'>
+<input  name="to" id="to" type='date'>
+<input name="from" id="from" type='date'>
+<input class="btn btn-primary signup" type="submit" value="Generate" name="generate" >
+</form>
+
 
 
 
@@ -250,7 +350,7 @@ Date :
 
 	
           <div class="panel-body">
-            <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="example">
+            <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" class="dataTable" id="example">
 <thead>
                 <tr>
                   <th>Date</th>
@@ -270,7 +370,7 @@ Date :
 			
 		  echo "<tr>"; 
 		  echo "<td>" . $row['date'] . "</td>";  
-		  echo "<td>" . $row['Username'] . "</td>";  
+		  echo "<td id='user_profile_col' OnClick='functionn()'>" . $row['Username'] . "</td>";  
 		  echo "<td>" . $row['Deposits'] . "</td>";  
 		  echo "<td>" . $row['Withdrawal'] . "</td>";  
 		  echo "<td>" . $row['Bets'] . "</td>";  
@@ -280,8 +380,24 @@ Date :
 		  echo "<td>" . $row['NetGaming'] . "</td>";  
 		  echo "<td>" . $row['ProgressiveShare'] . "</td>";  
 		  echo "</tr>"; 
-}?>
 		
+}?>
+
+ <tfoot>
+                <tr>
+                        <th style="text-align:right" colspan="2">Total:</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                </tr>
+        </tfoot>
+
+
 		  
             </table>
           </div>
@@ -310,16 +426,7 @@ Date :
   <script src="vendors/datatables/js/jquery.dataTables.min.js"></script> 
   <script src="vendors/datatables/dataTables.bootstrap.js"></script> 
   <script src="js/custom.js"></script> 
-  <script src="js/tables.js"></script></body>
-</html>
-<script type="text/javascript">
+  <script src="js/tables.js"></script> 
 
-$(document).ready(function() {
-    $('#example').dataTable( {
-        "footerCallback": function ( row, data, start, end, display ) {
-            var api = this.api();         
-            $(api.column(3).footer()).html('Footer Value'+'test');
-            };
-}
-}
-</script>
+</body>
+</html>

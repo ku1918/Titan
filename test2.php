@@ -1,162 +1,338 @@
+<?php
+session_start();
+include_once 'include/dbconnect2.php';
+
+if(!isset($_SESSION['user'])){
+        header ("Location: login.php");
+}
+
+$res=$db->query("select * from users where username='".$_SESSION['user']."'");
+$userRow=mysqli_fetch_array($res);
+$username=$userRow['username'];
+$userCategory=$userRow['category'];
+
+$getCredit=$db->query("select username,credit from ((select * from player_credit) union (select * from cashier_credit) union (select * from master_credit)) as a where a.username='$username'");
+$creditBalance=mysqli_fetch_array($getCredit);
+$sourceCredit=$creditBalance['credit'];
+
+$logging="select * from transaction_log";
+$result =$db->query($logging);
+$transactiondata=mysqli_fetch_array($result);
+
+
+
+?>
+
+<!DOCTYPE html>
 <html>
-<head>
-  <title>Forget password recovery using Ajax, php and mysqli | Mostlikers </title>
-  <link href='http://www.mostlikers.com/favicon.ico' rel='icon' type='image/x-icon'/>
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-   <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
-<style type="text/css">
-.error{
-margin-top: 6px;
-margin-bottom: 0;
-color: #fff;
-background-color: #D65C4F;
-display: table;
-padding: 5px 8px;
-font-size: 11px;
-font-weight: 600;
-line-height: 14px;
-  }
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
+    <title>App Testing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- jQuery UI -->
+    <link href="https://code.jquery.com/ui/1.10.3/themes/redmond/jquery-ui.css" rel="stylesheet" media="screen" />
+    <!-- Bootstrap -->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- styles -->
+    <link href="css/styles.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css" />
 
-</style>
-</head>
-<body>
-      <div class="modal-dialog">
-        <h2>Forget password recovery using Ajax, php and mysqli</h2>
-  <div>Demo <a href="http://www.mostlikers.com/2015/07/forget-password-recovery-using-ajax-php.html">Tutorial Link</a>
-   - mostlikers
-    <a href="http://www.mostlikers.com">mostlikers.com</a><br><br></div>
-        <div class="modal-content col-md-8">
-          <div class="modal-header">
-            <h4 class="modal-title"><i class="icon-paragraph-justify2"></i> User Login</h4>
-          </div>
-           <form method="post" autocomplete="off" id="login_form">
-              <div class="modal-body with-padding">
-                <div class="form-group">
-                  <div class="row">
-                    <div class="col-sm-10">
-                      <label>Username *</label>
-                      <input type="text" id="username" name="username"  class="form-control required">
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="row">
-                    <div class="col-sm-10">
-                      <label>Password *</label>
-                      <input type="password" id="password" name="password"  class="form-control required" value="">
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                     <p class="pull-right"><a href="#" data-toggle="modal" data-target=".resetpassword" data-dismiss="modal">
-                        Forgot Password? </a>
-                     </p>
-                  </div>
-              </div>
-           <div class="error" id="logerror"></div>
+    <script type="text/javascript" language="javascript" src="js/jquery.js"></script> 
+    <script type="text/javascript" language="javascript" src="js/jquery.dataTables.js"></script> 
 
-           <!-- end Add popup  -->
-            <div class="modal-footer">
-              <input type="hidden" name="id" value="" id="id">
-              <button type="submit" id="btn-login" class="btn btn-primary">Submit</button>
-            </div>
-          </form>
-        </div>
+<!-- Include Required Prerequisites -->
+<!--<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>  -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script> 
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" /> 
+ 
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script> 
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />   
+<!--<script type="text/javascript">
+function functionn()
+{
+ var id = 'test';
+ document.location.href = "http://appboss.duckdns.org/profile/userid?="+id;
+}
+</script> -->
 
-</div>
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- demo ads -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:728px;height:50px"
-     data-ad-client="ca-pub-9665679251236729"
-     data-ad-slot="6794107020"></ins>
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>
- <!-- Modal for Reset password Starts Here -->
-<div class="modal fade resetpassword" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal_dialog">
-    <div class="modal-content modal_content">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">X</button>
-      <h4 class="modal-title">Forgot Your password ?</h4>
-    </div>
-    <div class="modal-body">
-      <form class="form-horizontal"  action="#" id="form_reset_pwd">
-      <fieldset>
-        <p>Enter your Email Address here to receive a linkdd to change password.</p>
-        <div class="form-group">
-          <label class="col-sm-3 control-label">Email :</label>
-          <div class="col-sm-9">
-            <input type="text" class="form-control required email" name="email" placeholder="Email"/>
+
+<script type="text/javascript">
+$(function() {
+
+    function cb(start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+  	$('#to').val(start.format('YYYY-MM-DD'));
+        $('#from').val(end.format('YYYY-MM-DD'));
+    }
+    cb(moment().subtract(29, 'days'), moment());
+
+
+    $('#reportrange').daterangepicker({
+	 "timePicker": true,
+    "timePicker24Hour": true,
+    "timePickerSeconds": true,
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+
+});
+</script> 
+
+  </head>
+  <body>
+  <div class="header">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5">
+          <!-- Logo -->
+          <div class="logo">
+            <h1>
+              <a href="index.php">Admin Test Portal</a>
+            </h1>
           </div>
         </div>
-        <div id="error_result"></div>
-        <div class="form-group">
-          <div class="col-md-7 col-md-offset-5">
-            <button type="button" class="btn btn-primary forgot_password">Send Email</button>
+        <div class="col-md-5">
+          <div class="row">
+            <div class="col-lg-12"></div>
           </div>
         </div>
-      </fieldset>
-      </form>
-    </div>
+        <div class="col-md-2">
+          <div class="navbar navbar-inverse" role="banner">
+            <nav class="collapse navbar-collapse bs-navbar-collapse navbar-right" role="navigation">
+              <ul class="nav navbar-nav">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account<b class="caret"></b></a>
+                  <ul class="dropdown-menu animated fadeInUp">
+                    <li>
+                        <?php echo $username ?>
+                    </li>
+	                <?php if ($userCategory == 0){ ?>
+                                <li>Credit : Infinite </li>
+                                <?php } else{ ?>
+                                <li>Credit : RM <?php echo $sourceCredit ?></li>
+                                <?php } ?>
+
+                    <li>
+                      <a href="logout.php?logout">Logout</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+  <div class="page-content">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="sidebar content-box" style="display: block;">
+	 <ul class="nav">
+                    <!-- Main menu -->
+                    <li><a href="index.php"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
+			 <?php
+                      if($userCategory == 0){
+                ?>
+                    <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="master_credit_transfer.php">Master</a></li>
+                            <li><a href="cashier_credit_transfer.php">Cashier</a></li>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
+                        </ul>
+                    </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+                <?php
+                        }
+                        elseif($userCategory == 1){
+                        ?>
+                         <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="cashier_credit_transfer.php">Cashier</a></li>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
+                        </ul>
+                    </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+                <?php
+                }
+                elseif($userCategory == 2){
+ ?>
+                 <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Credit Transfer
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="player_credit_transfer.php">Player</a></li>
+                        </ul>
+                    </li>
+                    <li class="submenu">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Extra
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li><a href="signup_internal.php">Signup New User</a></li>
+                        </ul>
+                    </li>
+                <?php
+                }
+                ?>
 
-<!-- Modal for Reset password Ends Here -->
+
+	</ul>
+        </div>
+      </div>
+
+
+      <div class="col-md-10">
+ <div class="row">
+                                                <div class="col-md-12">
+                                                        <div class="content-box-header">
+                                                                <div class="panel-title">Search Filter</div>
+
+                                                        </div>
+                                                        <div class="content-box-large box-with-header">
+Date : 
+<div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 25%">
+    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+    <span></span> <b class="caret"></b>
+</div>
+<input  name="to" id="to" type='text'>
+<input name="from" id="from" type='text'>
+
+
+
+                                                        </div>
+                                                </div>
+                                        </div>
+
+
+        <div class="content-box-large">
+          <div class="panel-heading">
+            <div class="panel-title">Reports</div>
+          </div>
+
+	
+          <div class="panel-body">
+            <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" class="dataTable" id="example">
+<thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Username</th>
+                  <th>Deposits</th>
+                  <th>Withdrawal</th>
+                  <th>Bets</th>
+                  <th>Wins</th>
+                  <th>Net Loss</th>
+                  <th>Net Purchase</th>
+                  <th>Net Gaming</th>
+                  <th>Progressive Share</th>
+
+               </tr>
+</thead>
+		  <?php   while($row=mysqli_fetch_array($result)){  
+			
+		  echo "<tr>"; 
+		  echo "<td>" . $row['date'] . "</td>";  
+		  echo "<td id='user_profile_col' OnClick='functionn()'>" . $row['Username'] . "</td>";  
+		  echo "<td>" . $row['Deposits'] . "</td>";  
+		  echo "<td>" . $row['Withdrawal'] . "</td>";  
+		  echo "<td>" . $row['Bets'] . "</td>";  
+		  echo "<td>" . $row['Wins'] . "</td>";  
+		  echo "<td>" . $row['NetLoss'] . "</td>";  
+		  echo "<td>" . $row['NetPurchase'] . "</td>";  
+		  echo "<td>" . $row['NetGaming'] . "</td>";  
+		  echo "<td>" . $row['ProgressiveShare'] . "</td>";  
+		  echo "</tr>"; 
+		
+}?>
+
+ <tfoot>
+                <tr>
+                        <th style="text-align:right" colspan="2">Total:</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                </tr>
+        </tfoot>
+
+
+		  
+            </table>
+          </div>
+        </div>
+      </div>
+      </div>
+	  </div>
+     
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="copy text-center">Property of Seremban 
+      <a href='#'>Website</a></div>
+    </div>
+  </footer>
+  <link href="vendors/datatables/dataTables.bootstrap.css" rel="stylesheet" media="screen" />
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <!-- jQuery UI -->
+  <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script> 
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+   
+  <script src="bootstrap/js/bootstrap.min.js"></script> 
+  <script src="vendors/datatables/js/jquery.dataTables.min.js"></script> 
+  <script src="vendors/datatables/dataTables.bootstrap.js"></script> 
+  <script src="js/custom.js"></script> 
+  <script src="js/tables.js"></script> 
+
 </body>
 </html>
-<script>
-  $(document).ready(function(){
-    $('#login_form').validate();
-    $(document).on('click','#btn-login',function(){
-      var url = "login.php";
-      if($('#login_form').valid()){
-        $('#logerror').html('<img src="ajax.gif" align="absmiddle"> Please wait...');
-        $.ajax({
-        type: "POST",
-        url: url,
-        data: $("#login_form").serialize(), // serializes the form's elements.
-          success: function(data) {
-            if(data==1) {
-              window.location.href = "profile.php";
-            }
-     else {
-              $('#logerror').html('The email or password you entered is incorrect.');
-              $('#logerror').addClass("error");
-            }
-          }
-        });
-      }
-      return false;
-    });
-    $(document).on('click','.forgot_password',function(){
-      var url = "reset_password.php";
-      if($('#form_reset_pwd').valid()){
-        $('#error_result').html('<img src="ajax.gif" align="absmiddle"> Please wait...');
-        $.ajax({
-        type: "POST",
-        url: url,
-        data: $("#form_reset_pwd").serialize(), // serializes the form's elements.
-          success: function(data) {
-            if(data==1)
-            {
-              $('#error_result').html('Check your email');
-              $('#error_result').addClass("green");
-            }
-            else
-            {
-              $('#error_result').html('Invalid email id. Please check your email id.');
-              $('#error_result').addClass("red");
-            }
-          }
-        });
-      }
-      return false;
-    });
-});
-</script>
-                                    
