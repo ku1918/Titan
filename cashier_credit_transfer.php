@@ -15,110 +15,6 @@ $getCredit=$db->query("select username,credit from ((select * from player_credit
 $creditBalance=mysqli_fetch_array($getCredit);
 $sourceCredit=$creditBalance['credit'];
 
-  $targetUser=$_POST['target_username'];
-  $amount=$_POST['amount'];
-
-  $checkUser=$db->query("SELECT username FROM cashier_credit WHERE username='$targetUser'");
-  $userRowCount=mysqli_num_rows($checkUser);
-
-  $getTargetCreditSQL = $db->query("SELECT credit FROM cashier_credit WHERE username='$targetUser'");
-  $getTargetCreditArray=mysqli_fetch_array($getTargetCreditSQL);
-  $getTargetCreditArray2=$getTargetCreditArray['credit'];
-  $getTargetCreditFloat=floatval($getTargetCreditArray2);
-
-  $getSourceCreditFloat=floatval($sourceCredit);
-
-if(isset($_POST['topup'])){
-$totalAmount = $getTargetCreditFloat+$amount;
-$transferAmount = $getSourceCreditFloat-$amount;
-
-if($userRowCount > 0){
-
-if($amount > $getSourceCreditFloat && $userCategory != 0){
-?>
-        <script>alert('Insufficient Amount');</script>
-	<?php
-}
-else{
-$updateTarget = "UPDATE cashier_credit SET credit='$totalAmount' where username='$targetUser';";
-if(mysqli_query($db,$updateTarget) === TRUE)
-{
-if(mysqli_affected_rows($db)>0){
-
-if($userCategory == 1){
-$updateSource = "UPDATE master_credit SET credit='$transferAmount' where username='$username'";
-}
-elseif($userCategory == 2){
-$updateSource = "UPDATE cashier_credit SET credit='$transferAmount' where username='$username'";
-}
-
-$transfer=$db->query($updateSource);
-$message = mysqli_real_escape_string($db,"$username,$targetUser,$amount,-,$getTargetCreditFloat,$totalAmount");
-$logsql = "INSERT into transaction_log (date,transaction) values ( now(),'$message')";
-$logging=$db->query($logsql) or trigger_error($db->error."[$logsql]");
-  ?>
-        <script>alert('Topup success');</script>
-        <?php
-}
- else
- {
-  ?>
-        <script>alert('Topup Fail');</script>
-        <?php
- }
-}
-}
-}
-else{
-?>
-	<script>alert('Invalid User');</script>
-        <?php
-}
-}
-elseif(isset($_POST['withdraw'])){
-
-$totalAmount = $getTargetCreditFloat-$amount;
-$transferAmount = $getSourceCreditFloat+$amount;
-
-
-if($userRowCount > 0){
-if($amount > $getTargetCreditFloat ){
-?>
-        <script>alert('Withdraw Amount Exceed');</script>
-        <?php
-}
-else{
-$updateTarget = "UPDATE cashier_credit SET credit='$totalAmount' where username='$targetUser';";
-
-if(mysqli_query($db,$updateTarget) === TRUE)
-{
-if(mysqli_affected_rows($db) > 0){
-if($userCategory == 1){
-$updateSource = "UPDATE master_credit SET credit='$transferAmount' where username='$username'";
-}
-elseif($userCategory == 2){
-$updateSource = "UPDATE cashier_credit SET credit='$transferAmount' where username='$username'";
-}
-$transfer=$db->query($updateSource);
-  ?>
-        <script>alert('Withdraw success');</script>
-        <?php
-}
- else
- {
-  ?>
-        <script>alert('Withdraw Fail');</script>
-        <?php
- }
-}
-}
-}
-else{
-?>
-	<script>alert('Invalid User');</script>
-        <?php
-}
-}
 ?>
 
 
@@ -187,14 +83,8 @@ else{
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account<b class="caret"></b></a>
                   <ul class="dropdown-menu animated fadeInUp">
                     <li>
-                        <?php echo $username ?>
+                        Username: <?php echo $username ?>
                     </li>
-	                <?php if ($userCategory == 0){ ?>
-                                <li>Credit : Infinite </li>
-                                <?php } else{ ?>
-                                <li>Credit : RM <?php echo $sourceCredit ?></li>
-                                <?php } ?>
-
                     <li>
                       <a href="logout.php?logout">Logout</a>
                     </li>
@@ -298,31 +188,29 @@ else{
 
 	</ul>
         </div>
+  <!--Credit Balance Value -->
+                <div class="sidebar content-box" style="display: block;">
+                <b>Total Credit Balance:</b>
+                                <?php
+                                if ($userCategory == 0){
+                                 echo "<p style='float: right;'>Infinite</p>";
+                                }
+                                else{
+                                 echo "<p style='float: right;'>$sourceCredit</p>";
+                                }
+                                ?>
+                </div>
+
       </div>
       <div class="col-md-10">
-        <div class="content-box-large">
-          <div class="panel-heading">
-            <div class="panel-title">Player List</div>
-          </div>
-          <div class="panel-body">
-            <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="cashier-credit">
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Credit</th>
-                </tr>
-              </thead>
-            </table>
-          </div>
-        </div>
-		<div class="row">
+	  		<div class="row">
 		      <div class="col-md-5">
         <div class="content-box-large">
           <div class="panel-heading">
             <div class="panel-title">Top Up/Withdraw</div>
           </div>
           <div class="panel-body">
-            <form class="form-horizontal" role="form" method="post">
+            <form class="form-horizontal" role="form" action="cashier_credit_calculation.php" method="post">
               <div class="form-group">
                 <label for="Username" class="col-sm-2 control-label">Username</label>
                 <div class="col-sm-10">
@@ -366,6 +254,22 @@ else{
         </div>
       </div>
       </div>
+        <div class="content-box-large">
+          <div class="panel-heading">
+            <div class="panel-title">Player List</div>
+          </div>
+          <div class="panel-body">
+            <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="cashier-credit">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Credit</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+
 	  </div>
      
 

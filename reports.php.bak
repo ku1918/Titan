@@ -15,6 +15,8 @@ $getCredit=$db->query("select username,credit from ((select * from player_credit
 $creditBalance=mysqli_fetch_array($getCredit);
 $sourceCredit=$creditBalance['credit'];
 
+#$logging="select * from transaction_log where date between '$datefrom' and '$dateto'";
+
 $logging="select * from transaction_log";
 $result =$db->query($logging);
 $transactiondata=mysqli_fetch_array($result);
@@ -57,23 +59,6 @@ function functionn()
 }
 </script> -->
 
-<script type="text/javascript">
-$(document).ready(function() {
-    $('#example').dataTable( {
-        "aoColumnDefs": [
-            {
-                "fnRender": function ( oObj ) {
-                    return '<a href="url?var='+oObj.aData[0]'">oObj.aData[3]+'</a>';
-                },
-                "aTargets": [ 2 ]
-            }
-        ]
-    } );
-} );
-</script>
-
-
-
 
 <script type="text/javascript">
 $(function() {
@@ -105,7 +90,20 @@ $(function() {
 
 <script type="text/javascript" charset="utf-8">
                         $(document).ready(function() {
-                                $('#example').dataTable( {
+
+
+
+ $('#example').DataTable( {
+
+"columnDefs": [ {
+    "targets": 1,
+    "data": "google.com",
+    "render": function ( data, type, full, meta ) {
+      return data + " (" + '<a href=/profile.php?id='+data+'>Profile</a>' + ")";
+
+    }
+  } ],
+
                                         "fnFooterCallback": function ( nRow, aaData, iDataStart, iDataEnd ) {
                                                 /* Calculate the total market share for all browsers in this table (ie inc. outside
                                                  * the pagination
@@ -169,6 +167,11 @@ var api = this.api(), data;
                                                 nCells[7].innerHTML = total_page_netGaming;
                                                 nCells[8].innerHTML = total_page_progressiveShare;
                                         }
+
+
+
+
+
                                 } );
                         } );
 
@@ -202,14 +205,8 @@ var api = this.api(), data;
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account<b class="caret"></b></a>
                   <ul class="dropdown-menu animated fadeInUp">
                     <li>
-                        <?php echo $username ?>
+                        Username: <?php echo $username ?>
                     </li>
-	                <?php if ($userCategory == 0){ ?>
-                                <li>Credit : Infinite </li>
-                                <?php } else{ ?>
-                                <li>Credit : RM <?php echo $sourceCredit ?></li>
-                                <?php } ?>
-
                     <li>
                       <a href="logout.php?logout">Logout</a>
                     </li>
@@ -313,8 +310,20 @@ var api = this.api(), data;
 
 	</ul>
         </div>
-      </div>
+  <!--Credit Balance Value -->
+                <div class="sidebar content-box" style="display: block;">
+                <b>Total Credit Balance:</b>
+                                <?php
+                                if ($userCategory == 0){
+                                 echo "<p style='float: right;'>Infinite</p>";
+                                }
+                                else{
+                                 echo "<p style='float: right;'>$sourceCredit</p>";
+                                }
+                                ?>
+                </div>
 
+      </div>
 
       <div class="col-md-10">
  <div class="row">
@@ -329,8 +338,12 @@ Date :
     <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
     <span></span> <b class="caret"></b>
 </div>
-<input  name="to" id="to" type='text'>
-<input name="from" id="from" type='text'>
+<form method='post'>
+<input name="to" id="to" type='date'>
+<input name="from" id="from" type='date'>
+<input class="btn btn-primary signup" value="Generate" name="generate" >
+</form>
+
 
 
 
@@ -339,7 +352,7 @@ Date :
                                         </div>
 
 
-        <div class="content-box-large">
+        <div id="reports" class="content-box-large">
           <div class="panel-heading">
             <div class="panel-title">Reports</div>
           </div>

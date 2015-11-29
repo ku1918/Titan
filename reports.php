@@ -16,8 +16,14 @@ $creditBalance=mysqli_fetch_array($getCredit);
 $sourceCredit=$creditBalance['credit'];
 
 #$logging="select * from transaction_log where date between '$datefrom' and '$dateto'";
+  $to=$_POST['to'];
+  $from=$_POST['from'];
 
-$logging="select * from transaction_log";
+#$from='2015-11-27 00:00:00';
+#$to='2015-11-28 23:59:59';
+
+#$logging="SELECT * FROM `transaction_log` WHERE date >= '2015-11-27 00:00:00' and date < '2015-11-28 23:59:59'";
+$logging="select * from transaction_log where date >= '$from' and date <= '$to'";
 $result =$db->query($logging);
 $transactiondata=mysqli_fetch_array($result);
 
@@ -60,13 +66,15 @@ function functionn()
 </script> -->
 
 
+
+
 <script type="text/javascript">
 $(function() {
 
     function cb(start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-  	$('#to').val(start.format('YYYY-MM-DD'));
-        $('#from').val(end.format('YYYY-MM-DD'));
+  	$('#from').val(start.format('YYYY-MM-DD HH:mm:ss'));
+        $('#to').val(end.format('YYYY-MM-DD HH:mm:ss'));
     }
     cb(moment().subtract(29, 'days'), moment());
 
@@ -76,12 +84,12 @@ $(function() {
     "timePicker24Hour": true,
     "timePickerSeconds": true,
         ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+           'Today': [moment("00:00:00", "hh:mm:ss"), moment("23:59:59", "hh:mm:ss")],
+           'Yesterday': [moment("00:00:00", "hh:mm:ss").subtract(1, 'days'), moment("23:59:59", "hh:mm:ss").subtract(1, 'days')],
+           'Last 7 Days': [moment("00:00:00", "hh:mm:ss").subtract(6, 'days'), moment("23:59:59", "hh:mm:ss")],
+           'Last 30 Days': [moment("00:00:00", "hh:mm:ss").subtract(29, 'days'), moment("23:59:59", "hh:mm:ss")],
+           'This Month': [moment("00:00:00", "hh:mm:ss").startOf('month'), moment("23:59:59", "hh:mm:ss").endOf('month')],
+           'Last Month': [moment("00:00:00", "hh:mm:ss").subtract(1, 'month').startOf('month'), moment("23:59:59", "hh:mm:ss").subtract(1, 'month').endOf('month')]
         }
     }, cb);
 
@@ -90,7 +98,9 @@ $(function() {
 
 <script type="text/javascript" charset="utf-8">
                         $(document).ready(function() {
- $('#example').DataTable( {
+
+var oTable = $('#example').dataTable( {
+
 
 "columnDefs": [ {
     "targets": 1,
@@ -170,7 +180,9 @@ var api = this.api(), data;
 
 
                                 } );
+
                         } );
+
 
                 </script>
 
@@ -202,14 +214,8 @@ var api = this.api(), data;
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account<b class="caret"></b></a>
                   <ul class="dropdown-menu animated fadeInUp">
                     <li>
-                        <?php echo $username ?>
+                        Username: <?php echo $username ?>
                     </li>
-	                <?php if ($userCategory == 0){ ?>
-                                <li>Credit : Infinite </li>
-                                <?php } else{ ?>
-                                <li>Credit : RM <?php echo $sourceCredit ?></li>
-                                <?php } ?>
-
                     <li>
                       <a href="logout.php?logout">Logout</a>
                     </li>
@@ -313,8 +319,20 @@ var api = this.api(), data;
 
 	</ul>
         </div>
-      </div>
+  <!--Credit Balance Value -->
+                <div class="sidebar content-box" style="display: block;">
+                <b>Total Credit Balance:</b>
+                                <?php
+                                if ($userCategory == 0){
+                                 echo "<p style='float: right;'>Infinite</p>";
+                                }
+                                else{
+                                 echo "<p style='float: right;'>$sourceCredit</p>";
+                                }
+                                ?>
+                </div>
 
+      </div>
 
       <div class="col-md-10">
  <div class="row">
@@ -324,15 +342,25 @@ var api = this.api(), data;
 
                                                         </div>
                                                         <div class="content-box-large box-with-header">
-Date : 
+Date Range:
 <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 25%">
     <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
     <span></span> <b class="caret"></b>
 </div>
-<form method='post'>
-<input  name="to" id="to" type='date'>
-<input name="from" id="from" type='date'>
-<input class="btn btn-primary signup" type="submit" value="Generate" name="generate" >
+Date Range:
+<div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 25%">
+    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+    <span></span> <b class="caret"></b>
+</div>
+
+<form method="post" action"result.php">
+<input hidden name="from" id="from" type='date'>
+<input hidden name="to" id="to" type='date'>
+
+<div style="padding: 20px 1px">
+<input class="btn btn-primary signup" type="submit" value="Generate" name="submit" >
+</div>
+
 </form>
 
 
@@ -343,7 +371,7 @@ Date :
                                         </div>
 
 
-        <div class="content-box-large">
+        <div id="reports" class="content-box-large">
           <div class="panel-heading">
             <div class="panel-title">Reports</div>
           </div>

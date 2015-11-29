@@ -61,12 +61,7 @@ $sourceCredit=$creditBalance['credit'];
 	                      <li class="dropdown">
 	                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
 	                        <ul class="dropdown-menu animated fadeInUp">
-				<li><?php echo $username ?></li>
-				<?php if ($userCategory == 0){ ?> 
-				<li>Credit : Infinite </li>
-				<?php } else{ ?>
-				<li>Credit : RM <?php echo $sourceCredit ?></li>
-				<?php } ?>
+				<li>Username : <?php echo $username ?></li>
 	                          <li><a href="logout.php?logout">Logout</a></li>
 	                        </ul>
 	                      </li>
@@ -168,6 +163,18 @@ $sourceCredit=$creditBalance['credit'];
 			
                 </ul>
              </div>
+		<!--Credit Balance Value -->
+		<div class="sidebar content-box" style="display: block;">
+		<b>Total Credit Balance:</b>
+				<?php 
+				if ($userCategory == 0){
+				 echo "<p style='float: right;'>Infinite</p>";
+				}
+				else{
+				 echo "<p style='float: right;'>$sourceCredit</p>";
+				}
+				?>
+		</div>
 		  </div>
 		  <div class="col-md-10">
 		  	<div class="row">
