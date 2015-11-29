@@ -60,6 +60,7 @@ function functionn()
 </script> -->
 
 
+
 <script type="text/javascript">
 $(function() {
 
@@ -94,14 +95,28 @@ $(function() {
 
 "columnDefs": [ {
     "targets": 1,
-    "data": "google.com",
+    "data": "",
     "render": function ( data, type, full, meta ) {
       return data + " (" + '<a href=/profile.php?id='+data+'>Profile</a>' + ")";
 
     }
   } ],
 
-                                        "fnFooterCallback": function ( nRow, aaData, iDataStart, iDataEnd ) {
+                
+                                        "processing": true,
+                                        "serverSide": true,
+                                        "ajax":{
+                                                url :"reports-data.php", // json datasource
+                                                type: "post",  // method  , by default get
+                                                error: function(){  // error handling
+                                                        $(".reports-error").html("");
+                                                        $("#report-credit").append('<tbody class="master-credit-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                                                        $("#report-credit_processing").css("display","none");
+
+                                                }
+                                        },
+
+                        "fnFooterCallback": function ( nRow, aaData, iDataStart, iDataEnd ) {
                                                 /* Calculate the total market share for all browsers in this table (ie inc. outside
                                                  * the pagination
                                                  */
@@ -366,22 +381,6 @@ Date :
 
                </tr>
 </thead>
-		  <?php   while($row=mysqli_fetch_array($result)){  
-			
-		  echo "<tr>"; 
-		  echo "<td>" . $row['date'] . "</td>";  
-		  echo "<td id='user_profile_col' OnClick='functionn()'>" . $row['Username'] . "</td>";  
-		  echo "<td>" . $row['Deposits'] . "</td>";  
-		  echo "<td>" . $row['Withdrawal'] . "</td>";  
-		  echo "<td>" . $row['Bets'] . "</td>";  
-		  echo "<td>" . $row['Wins'] . "</td>";  
-		  echo "<td>" . $row['NetLoss'] . "</td>";  
-		  echo "<td>" . $row['NetPurchase'] . "</td>";  
-		  echo "<td>" . $row['NetGaming'] . "</td>";  
-		  echo "<td>" . $row['ProgressiveShare'] . "</td>";  
-		  echo "</tr>"; 
-		
-}?>
 
  <tfoot>
                 <tr>

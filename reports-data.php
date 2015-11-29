@@ -10,23 +10,40 @@ $requestData= $_REQUEST;
 
 $columns = array( 
 // datatable column index  => database column name
-	0 =>'username', 
-	1 => 'credit',
+	0 =>'date', 
+	1 => 'Username',
+	2 => 'Deposits',
+	3 => 'Withdrawal',
+	4 => 'Bets',
+	5 => 'Wins',
+	6 => 'NetLoss',
+	7 => 'NetPurchase',
+	8 => 'NetGaming',
+	9 => 'ProgressiveShare',
+
 );
 
 // getting total number records without any search
-$sql = "SELECT username,credit ";
-$sql.=" FROM master_credit";
+$sql = "SELECT *";
+$sql.=" FROM transaction_log";
 $query=mysqli_query($db, $sql) or die("Fail Query");
 $totalData = mysqli_num_rows($query);
 $totalFiltered = $totalData;  // when there is no search parameter then total number rows = total number filtered rows.
 
 
-$sql = "SELECT username,credit";
-$sql.=" FROM master_credit WHERE 1=1";
+$sql = "SELECT *";
+$sql.=" FROM transaction_log WHERE 1=1";
 if( !empty($requestData['search']['value']) ) {   // if there is a search parameter, $requestData['search']['value'] contains search parameter
-	$sql.=" AND ( username LIKE '".$requestData['search']['value']."%' ";    
-	$sql.=" OR credit LIKE '".$requestData['search']['value']."%' )";
+	$sql.=" AND ( date LIKE '".$requestData['search']['value']."%' ";    
+	$sql.=" OR Username LIKE '".$requestData['search']['value']."%' ";
+	$sql.=" OR Deposits LIKE '".$requestData['search']['value']."%' ";
+	$sql.=" OR Withdrawal LIKE '".$requestData['search']['value']."%' ";
+	$sql.=" OR Bets LIKE '".$requestData['search']['value']."%'";
+	$sql.=" OR Wins LIKE '".$requestData['search']['value']."%' ";
+	$sql.=" OR NetLoss LIKE '".$requestData['search']['value']."%' ";
+	$sql.=" OR NetPurchase LIKE '".$requestData['search']['value']."%' ";
+	$sql.=" OR NetGaming LIKE '".$requestData['search']['value']."%' ";
+	$sql.=" OR ProgressiveShare LIKE '".$requestData['search']['value']."%' )";
 
 }
 $query=mysqli_query($db, $sql) or die("Fail Query");
@@ -39,8 +56,16 @@ $data = array();
 while( $row=mysqli_fetch_array($query) ) {  // preparing an array
 	$nestedData=array(); 
 
-	$nestedData[] = $row["username"];
-	$nestedData[] = $row["credit"];
+	$nestedData[] = $row["date"];
+	$nestedData[] = $row["Username"];
+	$nestedData[] = $row["Deposits"];
+	$nestedData[] = $row["Withdrawal"];
+	$nestedData[] = $row["Bets"];
+	$nestedData[] = $row["Wins"];
+	$nestedData[] = $row["NetLoss"];
+	$nestedData[] = $row["NetPurchase"];
+	$nestedData[] = $row["NetGaming"];
+	$nestedData[] = $row["ProgressiveShare"];
 	
 	$data[] = $nestedData;
 }
