@@ -57,6 +57,7 @@ footer .copy{
 }
 
 .header .logo h1{
+   display:inline-block;
    font-size:30px;
    margin:0px;
    padding:10px 0px;
@@ -101,12 +102,16 @@ footer .copy{
 }
 
 .header .navbar .nav > li > a{
+   vertical-align: top;
    color:#fff !important;
    font-size:13px !important;
    border-bottom:0px !important;
    margin-top:0px !important;
    font-weight:bold;
+   
+
 }
+
 
 .header .navbar-nav>.open>a,.header  .navbar-nav>.open>a:hover,.header  .navbar-nav>.open>a:focus {
    background:none !important;
@@ -659,6 +664,10 @@ body {
 text-align:center;
     font-size: 15px;
 padding-top:30px;
+}
+
+.sidebyside{
+float:left;
 }
 
 /**#user_profile_col

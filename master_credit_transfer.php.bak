@@ -6,21 +6,19 @@ if(!isset($_SESSION['user'])){
         header ("Location: login.php");
 }
 
-
 $res=$db->query("select * from users where username='".$_SESSION['user']."'");
 $userRow=mysqli_fetch_array($res);
 $username=$userRow['username'];
 $userCategory=$userRow['category'];
 
-#$getCredit=$db->query("select username,credit from ((select * from player_credit) union (select * from cashier_credit) union (select * from master_credit)) as a where a.username='".$_SESSION['user']."'");
 $getCredit=$db->query("select username,credit from ((select * from player_credit) union (select * from cashier_credit) union (select * from master_credit)) as a where a.username='$username'");
 $creditBalance=mysqli_fetch_array($getCredit);
+$sourceCredit=$creditBalance['credit'];
 
   $targetUser=$_POST['target_username'];
   $amount=$_POST['amount'];
 
-  $checkUserSQL="SELECT username FROM master_credit WHERE username='$targetUser'";
-  $checkUser=$db->query($checkUserSQL);
+  $checkUser=$db->query("SELECT username FROM master_credit WHERE username='$targetUser'");
   $userRowCount=mysqli_num_rows($checkUser);
 
   $getTargetCreditSQL = $db->query("SELECT credit FROM master_credit WHERE username='$targetUser'");
@@ -28,10 +26,7 @@ $creditBalance=mysqli_fetch_array($getCredit);
   $getTargetCreditArray2=$getTargetCreditArray['credit'];
   $getTargetCreditFloat=floatval($getTargetCreditArray2);
 
-  #$getSourceCreditSQL = $db->query("SELECT * FROM ((select * from player_credit) union (select * from cashier_credit) union (select * from master_credit)) as a where a.username='".$_SESSION['user']."'");
-  #$getSourceCreditArray=mysqli_fetch_array($getSourceCreditSQL);
-  $getSourceCreditArray2=$getSourceCreditArray['credit'];
-  $getSourceCreditFloat=floatval($getSourceCreditArray2);
+  $getSourceCreditFloat=floatval($sourceCredit);
 
 if(isset($_POST['topup'])){
 $totalAmount = $getTargetCreditFloat+$amount;
@@ -39,7 +34,7 @@ $transferAmount = $getSourceCreditFloat-$amount;
 
 if($userRowCount > 0){
 
-if($amount > $getSourceCreditFloat){
+if($amount > $getSourceCreditFloat && $userCategory != 0){
 ?>
         <script>alert('Insufficient Amount');</script>
 	<?php
@@ -49,11 +44,21 @@ $updateTarget = "UPDATE master_credit SET credit='$totalAmount' where username='
 if(mysqli_query($db,$updateTarget) === TRUE)
 {
 if(mysqli_affected_rows($db)>0){
+
+if($userCategory == 1){
 $updateSource = "UPDATE master_credit SET credit='$transferAmount' where username='$username'";
+}
+elseif($userCategory == 2){
+$updateSource = "UPDATE cashier_credit SET credit='$transferAmount' where username='$username'";
+}
+
 $transfer=$db->query($updateSource);
+$message = mysqli_real_escape_string($db,"$username,$targetUser,$amount,-,$getTargetCreditFloat,$totalAmount");
+$logsql = "INSERT into transaction_log (date,transaction) values ( now(),'$message')";
+$logging=$db->query($logsql) or trigger_error($db->error."[$logsql]");
   ?>
         <script>alert('Topup success');</script>
-        <?php
+        <?php 
 }
  else
  {
@@ -88,7 +93,12 @@ $updateTarget = "UPDATE master_credit SET credit='$totalAmount' where username='
 if(mysqli_query($db,$updateTarget) === TRUE)
 {
 if(mysqli_affected_rows($db) > 0){
+if($userCategory == 1){
 $updateSource = "UPDATE master_credit SET credit='$transferAmount' where username='$username'";
+}
+elseif($userCategory == 2){
+$updateSource = "UPDATE cashier_credit SET credit='$transferAmount' where username='$username'";
+}
 $transfer=$db->query($updateSource);
   ?>
         <script>alert('Withdraw success');</script>
@@ -126,8 +136,13 @@ else{
     <!-- styles -->
     <link href="css/styles.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.css" />
-    <script type="text/javascript" language="javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" language="javascript" src="js/jquery.js"></script> 
     <script type="text/javascript" language="javascript" src="js/jquery.dataTables.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+
+
       <script type="text/javascript" language="javascript" >
                         $(document).ready(function() {
                                 var dataTable = $('#master-credit').DataTable( {
@@ -172,9 +187,14 @@ else{
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account<b class="caret"></b></a>
                   <ul class="dropdown-menu animated fadeInUp">
                     <li>
-                        <?php echo $userRow['username']?>
+                        <?php echo $username ?>
                     </li>
-                    <li>Credit : RM <?php echo $creditBalance['credit']?></li>
+	                <?php if ($userCategory == 0){ ?>
+                                <li>Credit : Infinite </li>
+                                <?php } else{ ?>
+                                <li>Credit : RM <?php echo $sourceCredit ?></li>
+                                <?php } ?>
+
                     <li>
                       <a href="logout.php?logout">Logout</a>
                     </li>
@@ -194,8 +214,7 @@ else{
 	 <ul class="nav">
                     <!-- Main menu -->
                     <li><a href="index.php"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
-
-			<?php
+			 <?php
                       if($userCategory == 0){
                 ?>
                     <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
@@ -250,7 +269,7 @@ else{
                 <?php
                 }
                 elseif($userCategory == 2){
-    ?>
+ ?>
                  <li><a href="reports.php"><i class="glyphicon glyphicon-list"></i> Reports</a></li>
                     <li class="submenu">
                          <a href="#">
@@ -276,11 +295,63 @@ else{
                 }
                 ?>
 
+
 	</ul>
         </div>
       </div>
       <div class="col-md-10">
+        		<div class="row">
+		      <div class="col-md-5">
         <div class="content-box-large">
+          <div class="panel-heading">
+            <div class="panel-title">Top Up/Withdraw</div>
+          </div>
+          <div class="panel-body">
+            <form class="form-horizontal" role="form" method="post">
+              <div class="form-group">
+                <label for="Username" class="col-sm-2 control-label">Username</label>
+                <div class="col-sm-10">
+ <?php
+                        $dropDownSQL=$db->query("SELECT username from master_credit");
+                ?>
+                <select name="target_username" class="form-control" >
+                <option value="0">Choose</option>
+                <?php
+                        while($dropdown = mysqli_fetch_array($dropDownSQL)){
+                                echo '<option value="'.$dropdown['username'].'">'. $dropdown['username'].'</option>';
+                        }
+                ?>
+                </select>
+
+            <!--      <input type="text" class="form-control" placeholder="Username" required="" id="target_username" name="target_username" /> -->
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-md-2" for="prepend">Credit</label>
+                <div class="col-md-10">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <div class="input-group">
+                      <span class="input-group-addon">RM</span> 
+                      <input class="form-control" name="amount" id="amount" required="" placeholder="Amount" type="number" step="any" /></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+		<div class="form-group">
+                                                                    <div class="col-sm-offset-2 col-sm-10">
+                                                                        <input class="btn btn-primary" type="submit" value="Top Up" id="topup" name="topup"  onClick="return confirm('Confirm Topup?');" >
+                                                                        <input class="btn btn-primary" type="submit" value="Withdraw" name="withdraw" id="withdraw" onClick="return confirm('Confirm Withdraw?');">
+
+                                                                    </div>
+                                                                  </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+      </div>
+		<div class="content-box-large">
           <div class="panel-heading">
             <div class="panel-title">Player List</div>
           </div>
@@ -295,45 +366,6 @@ else{
             </table>
           </div>
         </div>
-		<div class="row">
-		      <div class="col-md-5">
-        <div class="content-box-large">
-          <div class="panel-heading">
-            <div class="panel-title">Top Up/Withdraw</div>
-          </div>
-          <div class="panel-body">
-            <form class="form-horizontal" role="form" method="post">
-              <div class="form-group">
-                <label for="Username" class="col-sm-2 control-label">Username</label>
-                <div class="col-sm-10">
-                  <input type="text" class="form-control" placeholder="Username" required="" id="target_username" name="target_username" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="control-label col-md-2" for="prepend">Credit</label>
-                <div class="col-md-10">
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <div class="input-group">
-                      <span class="input-group-addon">RM</span> 
-                      <input class="form-control" name="amount" id="amount" required="" placeholder="Amount" type="number" /></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-		<div class="form-group">
-                                                                    <div class="col-sm-offset-2 col-sm-10">
-                                                                        <input class="btn btn-primary" type="submit" value="Top Up" id="topup" name="topup" >
-                                                                        <input class="btn btn-primary" type="submit" value="Withdraw" name="withdraw" id="withdraw">
-
-                                                                    </div>
-                                                                  </div>
-
-            </form>
-          </div>
-        </div>
-      </div>
-      </div>
 	  </div>
      
 
