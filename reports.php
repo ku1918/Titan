@@ -20,11 +20,13 @@ $sourceCredit=$creditBalance['credit'];
   $from=$_POST['from'];
 
 #$from='2015-11-27 00:00:00';
-#$to='2015-11-28 23:59:59';
+#$to='2015-11-29 23:59:59';
 
 #$logging="SELECT * FROM `transaction_log` WHERE date >= '2015-11-27 00:00:00' and date < '2015-11-28 23:59:59'";
-$logging="select * from transaction_log where date >= '$from' and date <= '$to'";
+$logging="select * from transaction_log";
+$logging2="select * from spin_game_log where PlayTime >= '$from' and PlayTime <= '$to'";
 $result =$db->query($logging);
+$result2 =$db->query($logging2);
 $transactiondata=mysqli_fetch_array($result);
 
 
@@ -84,6 +86,7 @@ $(function() {
     "timePicker24Hour": true,
     "timePickerSeconds": true,
         ranges: {
+           //'Today': [moment("00:00:00", "hh:mm:ss"), moment("23:59:59", "hh:mm:ss")],
            'Today': [moment("00:00:00", "hh:mm:ss"), moment("23:59:59", "hh:mm:ss")],
            'Yesterday': [moment("00:00:00", "hh:mm:ss").subtract(1, 'days'), moment("23:59:59", "hh:mm:ss").subtract(1, 'days')],
            'Last 7 Days': [moment("00:00:00", "hh:mm:ss").subtract(6, 'days'), moment("23:59:59", "hh:mm:ss")],
@@ -347,17 +350,12 @@ Date Range:
     <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
     <span></span> <b class="caret"></b>
 </div>
-Date Range:
-<div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 25%">
-    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
-    <span></span> <b class="caret"></b>
-</div>
 
 <form method="post" action"result.php">
-<input hidden name="from" id="from" type='date'>
-<input hidden name="to" id="to" type='date'>
+<input hidden name="from" id="from" type='text'>
+<input hidden name="to" id="to" type='text'>
 
-<div style="padding: 20px 1px">
+<div style="padding: 20px 1px;">
 <input class="btn btn-primary signup" type="submit" value="Generate" name="submit" >
 </div>
 
@@ -394,19 +392,19 @@ Date Range:
 
                </tr>
 </thead>
-		  <?php   while($row=mysqli_fetch_array($result)){  
+		  <?php   while($row=mysqli_fetch_array($result2)){  
 			
 		  echo "<tr>"; 
-		  echo "<td>" . $row['date'] . "</td>";  
+		  echo "<td>" . $row['PlayTime'] . "</td>";  
 		  echo "<td id='user_profile_col' OnClick='functionn()'>" . $row['Username'] . "</td>";  
-		  echo "<td>" . $row['Deposits'] . "</td>";  
-		  echo "<td>" . $row['Withdrawal'] . "</td>";  
-		  echo "<td>" . $row['Bets'] . "</td>";  
-		  echo "<td>" . $row['Wins'] . "</td>";  
-		  echo "<td>" . $row['NetLoss'] . "</td>";  
-		  echo "<td>" . $row['NetPurchase'] . "</td>";  
-		  echo "<td>" . $row['NetGaming'] . "</td>";  
-		  echo "<td>" . $row['ProgressiveShare'] . "</td>";  
+		  echo "<td>" . sprintf('%0.2f',$row['Deposits']/100) . "</td>";  
+		  echo "<td>" . sprintf('%0.2f',$row['Withdrawal']/100) . "</td>";  
+		  echo "<td>" . sprintf('%0.2f',$row['BetValue']/100) . "</td>";  
+		  echo "<td>" . sprintf('%0.2f',$row['WinValue']/100) . "</td>";  
+		  echo "<td>" .  sprintf('%0.2f',$row['NetLoss']/100) . "</td>";  
+		  echo "<td>" .  sprintf('%0.2f',$row['NetPurchase']/100) . "</td>";  
+		  echo "<td>" .  sprintf('%0.2f',$row['NetGaming']/100) . "</td>";  
+		  echo "<td>" .  sprintf('%0.2f',$row['ProgressiveShare']/100) . "</td>"; 
 		  echo "</tr>"; 
 		
 }?>

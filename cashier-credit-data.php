@@ -40,7 +40,7 @@ while( $row=mysqli_fetch_array($query) ) {  // preparing an array
 	$nestedData=array(); 
 
 	$nestedData[] = $row["username"];
-	$nestedData[] = $row["credit"];
+	$nestedData[] =  sprintf('%0.2f',$row["credit"]/100);
 	
 	$data[] = $nestedData;
 }

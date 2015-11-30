@@ -235,8 +235,8 @@ $sourceCredit=$creditBalance['credit'];
                   <div class="row">
                     <div class="col-sm-12">
                       <div class="input-group">
-                      <span class="input-group-addon">RM</span> 
-                      <input class="form-control" name="amount" id="amount" required="" placeholder="Amount" type="number" step="any" /></div>
+                      <span class="input-group-addon">$$</span>  
+                      <input class="form-control" name="amount" id="amount" required="" placeholder="Amount" type="number" step="0.01" /></div>
                     </div>
                   </div>
                 </div>
