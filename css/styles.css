@@ -666,8 +666,29 @@ text-align:center;
 padding-top:30px;
 }
 
-.sidebyside{
-float:left;
+#reportrange{
+background: #fff; 
+cursor: pointer; 
+padding: 5px 10px; 
+border: 1px solid #ccc; 
+width: 25%
+display: inline-block;
+display: inline;
+vertical-align: top;
+}
+#Category{
+padding: 5px 10px; 
+width: 25%
+display: inline-block;
+display: inline;
+vertical-align: top;
+}
+#Username{
+padding: 5px 10px; 
+width: 25%
+display: inline-block;
+display: inline;
+vertical-align: top;
 }
 
 /**#user_profile_col

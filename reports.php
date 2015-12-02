@@ -25,8 +25,10 @@ $sourceCredit=$creditBalance['credit'];
 #$logging="SELECT * FROM `transaction_log` WHERE date >= '2015-11-27 00:00:00' and date < '2015-11-28 23:59:59'";
 $logging="select * from transaction_log";
 $logging2="select * from spin_game_log where PlayTime >= '$from' and PlayTime <= '$to'";
+$logging3="select CAST(PlayTime AS DATE) AS GameDate,Sum(WinValue) AS WinValue,Sum(BetValue) AS BetValue from spin_game_log where PlayTime >= '$from' and PlayTime <= '$to' GROUP BY GameDate";
 $result =$db->query($logging);
 $result2 =$db->query($logging2);
+$result3 =$db->query($logging3);
 $transactiondata=mysqli_fetch_array($result);
 
 
@@ -155,6 +157,9 @@ var api = this.api(), data;
                                 total_page_progressiveShare = api.column( 9, { page: 'current'} ).data().reduce( function (a, b) {
                                         return intVal(a) + intVal(b);
                                 }, 0 );
+                                total_page_activePlayer = api.column( 10, { page: 'current'} ).data().reduce( function (a, b) {
+                                        return intVal(a) + intVal(b);
+                                }, 0 );
 				
 
                                 total_page_deposits = parseFloat(total_page_deposits).toFixed(2);
@@ -165,6 +170,7 @@ var api = this.api(), data;
                                 total_page_netPurchase = parseFloat(total_page_netPurchase).toFixed(2);
                                 total_page_netGaming = parseFloat(total_page_netGaming).toFixed(2);
                                 total_page_progressiveShare = parseFloat(total_page_progressiveShare).toFixed(2);
+                                total_page_activePlayer = parseFloat(total_page_activePlayer);
 
                                                 /* Modify the footer row to match what we want */
                                                 var nCells = nRow.getElementsByTagName('th');
@@ -176,6 +182,7 @@ var api = this.api(), data;
                                                 nCells[6].innerHTML = total_page_netPurchase;
                                                 nCells[7].innerHTML = total_page_netGaming;
                                                 nCells[8].innerHTML = total_page_progressiveShare;
+                                                nCells[9].innerHTML = total_page_activePlayer;
                                         }
 
 
@@ -339,17 +346,21 @@ var api = this.api(), data;
 
       <div class="col-md-10">
  <div class="row">
-                                                <div class="col-md-12">
+                                                <div class="col-md-6">
                                                         <div class="content-box-header">
                                                                 <div class="panel-title">Search Filter</div>
 
                                                         </div>
                                                         <div class="content-box-large box-with-header">
 Date Range:
-<div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 25%">
+<!--<div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 25%">-->
+<div id="reportrange">
     <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
     <span></span> <b class="caret"></b>
 </div>
+
+
+
 
 <form method="post" action"result.php">
 <input hidden name="from" id="from" type='text'>
@@ -389,13 +400,14 @@ Date Range:
                   <th>Net Purchase</th>
                   <th>Net Gaming</th>
                   <th>Progressive Share</th>
+                  <th>Active Player</th>
 
                </tr>
 </thead>
-		  <?php   while($row=mysqli_fetch_array($result2)){  
+		  <?php   while($row=mysqli_fetch_array($result3)){  
 			
 		  echo "<tr>"; 
-		  echo "<td>" . $row['PlayTime'] . "</td>";  
+		  echo "<td>" . $row['GameDate'] . "</td>";  
 		  echo "<td id='user_profile_col' OnClick='functionn()'>" . $row['Username'] . "</td>";  
 		  echo "<td>" . sprintf('%0.2f',$row['Deposits']/100) . "</td>";  
 		  echo "<td>" . sprintf('%0.2f',$row['Withdrawal']/100) . "</td>";  
@@ -405,6 +417,7 @@ Date Range:
 		  echo "<td>" .  sprintf('%0.2f',$row['NetPurchase']/100) . "</td>";  
 		  echo "<td>" .  sprintf('%0.2f',$row['NetGaming']/100) . "</td>";  
 		  echo "<td>" .  sprintf('%0.2f',$row['ProgressiveShare']/100) . "</td>"; 
+		  echo "<td>" .  $row['Username'] . "</td>";  
 		  echo "</tr>"; 
 		
 }?>
@@ -412,6 +425,7 @@ Date Range:
  <tfoot>
                 <tr>
                         <th style="text-align:right" colspan="2">Total:</th>
+                        <th></th>
                         <th></th>
                         <th></th>
                         <th></th>

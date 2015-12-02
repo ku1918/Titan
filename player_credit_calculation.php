@@ -3,7 +3,7 @@ session_start();
 include_once 'include/dbconnect2.php';
 
  $targetUser=$_POST['target_username'];
-  $amount=$_POST['amount'];
+  $amount=$_POST['amount']*100;
 
   $checkUser=$db->query("SELECT username FROM player_credit WHERE username='$targetUser'");
   $userRowCount=mysqli_num_rows($checkUser);
